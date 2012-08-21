@@ -80,3 +80,7 @@ While these were the only "Tested" systems, installation should work on ALL Linu
 
 Drop me a line if you have any questions.
 
+.. _kenova.sh: http://downloads.rackerua.com/tools/kenova.sh
+.. _Python Nova Client On GIT hub: https://github.com/openstack/python-novaclient
+.. _Git Client Download and Information: http://git-scm.com/downloads
+.. _Python from python.org: http://www.python.org/getit/
