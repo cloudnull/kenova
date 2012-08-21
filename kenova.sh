@@ -4,6 +4,7 @@
 # - author       : Kevin Carter
 # - date         : 2012-06-05
 # - version      : 1.4    
+# - License      : GPLv3
 # - usage        : bash kenova
 # - notes        : Requires Python, NovaClient; 
 # - notes        : While not needed for operation, Git is needed for installation.
