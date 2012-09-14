@@ -1,11 +1,12 @@
-The python Nova Client is a powerful python based tool that can assist in A LOT of Openstack / Rackspace Cloud Functions.  When you interface with python-nova-client you are using some fantastic libraries that extend the functionality of the Cloud.  
-
-Please have a look here to review the work done by many other very bright people. Please review the `Python Nova Client On GIT hub`_\.
-
 kenova
 ^^^^^^
 
 What the kenova.sh script does is create a wrapper script for the python nova client, which simplifies the users interactions with the python-novaclient.  The script is FULL Featured and works with the Rackspace Cloud in all Active environments.  This includes :
+
+The python Nova Client is a powerful python based tool that can assist in A LOT of Openstack / Rackspace Cloud Functions.  When you interface with python-nova-client you are using some fantastic libraries that extend the functionality of the Cloud.  
+
+Please have a look here to review the work done by many other very bright people. Please review the `Python Nova Client On GIT hub`_\.
+
 
 * US Cloud Servers
 * US Open Cloud Servers
@@ -80,3 +81,7 @@ While these were the only "Tested" systems, installation should work on ALL Linu
 
 Drop me a line if you have any questions.
 
+.. _kenova.sh: http://downloads.rackerua.com/tools/kenova.sh
+.. _Python Nova Client On GIT hub: https://github.com/openstack/python-novaclient
+.. _Git Client Download and Information: http://git-scm.com/downloads
+.. _Python from python.org: http://www.python.org/getit/
