@@ -471,20 +471,16 @@ echo "Usage: $0 <EXPRESSION>"
 echo '
 Base Functions :
       where     -- Tells you where the script is located
-      weather  -- Tells you the weather for a specified Zip Code
 	  
 Usage Functions :
       new       -- Used to specify a Username and API Key
-
       lus       -- Used to access Legacy US Cloud Servers
       luk       -- Used to access Legacy UK Cloud Servers
-
       ous       -- Used to access Open Cloud US Cloud Servers,
-                  \_ You have to specify a Region 
-                     \_Available Regions are : ord & dfw
+                   |_ You have to specify a Region 
+                   |_ Available Regions are : ord & dfw
 					
       ouk       -- Used to access Open Cloud UK Cloud Servers
-
       clean     -- Removes all temp files for user interactions, 
                    This is also done automatically every 30 minutes
 
