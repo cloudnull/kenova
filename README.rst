@@ -28,27 +28,20 @@ The ``kenova`` wrapper has been tested to work on most Linux and Unix systems th
 
   Base Functions :
       where     -- Tells you where the script is located
-      weather  -- Tells you the weather for a specified Zip Code
-      install   -- Installs the script into the $PATH
           
   Usage Functions :
       new       -- Used to specify a Username and API Key
-
       lus       -- Used to access Legacy US Cloud Servers
       luk       -- Used to access Legacy UK Cloud Servers
-
       ous       -- Used to access Open Cloud US Cloud Servers,
-                                  \_ You have to specify a Region 
-                                    \_Available Regions are : ord & dfw
-
+                   You have to specify a Region 
+                   Available Regions are : ord & dfw
       ouk       -- Used to access Open Cloud UK Cloud Servers
-
       clean     -- Removes all temp files for user interactions, 
-                       This is also done automatically every 30 minutes
+                   This is also done automatically every 30 minutes
 
   Repair and Upgrade Functions :
       repair    -- Identifies and Repairs python modules that are know to be incompatible
-      upgrade   -- Upgrades the kenova script
 
 
 Once you have authenticated with the user name and the API-Key for the account that you want to interact with, simply enter the country that you are authenticated against and the function that you would like to perform.
@@ -56,11 +49,16 @@ Once you have authenticated with the user name and the API-Key for the account t
 Once you have the script you will need to install it
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Install the wrapper, which will download the latest NOVA-Client.
+Install the wrapper, which will download the latest Python-NovaClient from the folks at Openstack. This will also install the package Python-LNovaClient which is an adaptation of the openstack client which provides functionality for the Legacy Rackspace Cloud. Additionally the installer will get and install the Rackspace Nova Extensions which provide more capability on the Python-NovaClient.  
+
+Here are the three repositories that are installed when using the scripted installation method :
+  * `Legacy Python-NovaClient`_
+  * `Openstack Python-NovaClient`_
+  * `Rackspace Python-NovaClient Extensions`_
 
 .. code-block:: bash
 
-    sudo bash kenova.sh install
+    sudo bash install.sh
 
 Once installed it is part of the ``$PATH`` you can verify that with the `which` command
 
@@ -85,3 +83,6 @@ Drop me a line if you have any questions.
 .. _Python Nova Client On GIT hub: https://github.com/openstack/python-novaclient
 .. _Git Client Download and Information: http://git-scm.com/downloads
 .. _Python from python.org: http://www.python.org/getit/
+.. _Legacy Python-NovaClient: https://github.com/cloudnull/python-lnovaclient
+.. _Openstack Python-NovaClient: https://github.com/openstack/python-novaclient
+.. _Rackspace Python-NovaClient Extensions: https://github.com/rackspace/rackspace-novaclient
