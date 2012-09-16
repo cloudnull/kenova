@@ -13,11 +13,12 @@
 
 ## User Defined ##
 
-# Installer for the python-novaclient script
+# Installer for the python-lnovaclient script
 LNOVAVERSIONGIT="https://github.com/cloudnull/python-lnovaclient.git"
 
 # Installer for the python-novaclient script
 NOVAVERSIONGIT="git://github.com/openstack/python-novaclient.git"
+RAXNOVAVERSIONGIT="https://github.com/rackspace/rackspace-novaclient.git"
 
 # Temp Directory 
 TEMPDIR="/tmp/"
@@ -244,6 +245,7 @@ fi
 			rm -rf $OPENSTACKNOVACLIENTDIR
 		fi
 			git clone ${NOVAVERSIONGIT}
+			git clone ${RAXNOVAVERSIONGIT}
 			else
 				echo "We are failing because we found no way to proceed."
 				exit 1
@@ -268,8 +270,15 @@ fi
 cd $OPENSTACKNOVACLIENTDIR
 	python setup.py install > ~/NovaClient.Installation.log
 
+cd $RAXNOVACLIENTDIR
+        python setup.py install >> ~/NovaClient.Installation.log
+
 if [ -d $OPENSTACKNOVACLIENTDIR ];then 
 	rm -rf $OPENSTACKNOVACLIENTDIR
+fi
+
+if [ -d $RAXNOVACLIENTDIR ];then
+        rm -rf $RAXNOVACLIENTDIR
 fi
 
 
@@ -294,7 +303,7 @@ echo -e "\n3 - I am getting the installation files for python-novaclient.\n"
 	fi
 
 	cd $LEGACYNOVACLIENTDIR
-	python $LEGACYNOVACLIENTDIR/setup.py install
+	python $LEGACYNOVACLIENTDIR/setup.py install >> ~/LNovaClient.Installation.log
 
 if [ -d $LEGACYNOVACLIENTDIR ];then 
 	rm -rf $LEGACYNOVACLIENTDIR
