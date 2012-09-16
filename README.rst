@@ -49,7 +49,7 @@ Once you have authenticated with the user name and the API-Key for the account t
 Once you have the script you will need to install it
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Install the wrapper, which will download the latest Python-NovaClient from the folks at Openstack. This will also install the package Python-LNovaClient which is an adaptation of the openstack client which provides functionality for the Legacy Rackspace Cloud. Additionally the installer will get and install the Rackspace Nova Extensions which provide more capability on the Python-NovaClient.  
+Install the wrapper, which will download the latest Python-NovaClient from the folks at Openstack. This will also install the package Python-LNovaClient which is an adaptation of the openstack client which provides functionality for the Legacy Rackspace Cloud. Additionally the installer will get and install the Rackspace Nova Extensions which provide more capability for the Python-NovaClient.  
 
 Here are the three repositories that are installed when using the scripted installation method :
   * `Legacy Python-NovaClient`_
