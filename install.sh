@@ -24,6 +24,7 @@ RAXNOVAVERSIONGIT="https://github.com/rackspace/rackspace-novaclient.git"
 TEMPDIR="/tmp/"
 LEGACYNOVACLIENTDIR="/tmp/python-lnovaclient"
 OPENSTACKNOVACLIENTDIR="/tmp/python-novaclient"
+RAXNOVACLIENTDIR="/tmp/rackspace-novaclient"
 
 CHECKFORROOT(){
 # Root user check for install 
