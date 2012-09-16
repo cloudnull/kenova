@@ -268,9 +268,9 @@ fi
 cd $OPENSTACKNOVACLIENTDIR
 	python setup.py install > ~/NovaClient.Installation.log
 
-#if [ -d $OPENSTACKNOVACLIENTDIR ];then 
-#	rm -rf $OPENSTACKNOVACLIENTDIR
-#fi
+if [ -d $OPENSTACKNOVACLIENTDIR ];then 
+	rm -rf $OPENSTACKNOVACLIENTDIR
+fi
 
 
 }
@@ -294,27 +294,7 @@ echo -e "\n3 - I am getting the installation files for python-novaclient.\n"
 	fi
 
 	cd $LEGACYNOVACLIENTDIR
-
-if [ -f $LEGACYNOVACLIENTDIR/tools/pip-requires ];then
-	echo -e "\nFixing pip so that it only installs the known working prettytable module.\npip-requires File Found.\n"
-	if [ `grep -i prettytable $LEGACYNOVACLIENTDIR/tools/pip-requires` ];then
-		sed 's/prettytable==0\.6/prettytable==0\.5/g' $LEGACYNOVACLIENTDIR/tools/pip-requires > /tmp/pip-requires.mod
-			rm $LEGACYNOVACLIENTDIR/tools/pip-requires
-				mv /tmp/pip-requires.mod $LEGACYNOVACLIENTDIR/tools/pip-requires
-	fi
-fi
-
-FINDPRETTYTABLE=$(grep prettytable /tmp/python-novaclient/setup.py)
-if [ "$FINDPRETTYTABLE" ];then
-	sed 's/prettytable/prettytable==0\.5/g' $LEGACYNOVACLIENTDIR/setup.py > $LEGACYNOVACLIENTDIR/setup.py.old
-		rm $LEGACYNOVACLIENTDIR/setup.py
-			mv $LEGACYNOVACLIENTDIR/setup.py.old $LEGACYNOVACLIENTDIR/setup.py
-fi
-
 	python $LEGACYNOVACLIENTDIR/setup.py install
-		LEGACYNOVA=`which nova`
-			mv $LEGACYNOVA $(echo $LEGACYNOVA | sed 's/nova/lnova/')
-
 
 if [ -d $LEGACYNOVACLIENTDIR ];then 
 	rm -rf $LEGACYNOVACLIENTDIR
