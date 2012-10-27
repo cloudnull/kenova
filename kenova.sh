@@ -18,37 +18,45 @@ SCRIPTLOCATION="$0"
 ## How long show I retain the information, in seconds ---
 SLEEPTIME="1800"
 
-CHECKFORROOT(){
-# Root user check for install 
-USERCHECK=$( whoami  )
-if [ "$(id -u)" != "0" ]; then
-   echo "This script must be run as ROOT"
-        echo "You have attempted to run this as $USERCHECK"
-                echo "use sudo $0 $1 or change to root."
-   exit 1
+# User Defined Variables
+IAMWHO=$(whoami)
+TEMP="/tmp"
+INFO="$TEMP/$IAMWHO.cloudapi.info"
+
+
+
+# Checking to see that nova and lnova are installed
+NOVA=$(which nova)
+if [ -z "$NOVA" ];then
+clear
+    echo -e '\nThis is a Python Wrapper for Openstack Nova Instances.\nYou will need to install Openstack-Novaclient in order to proceed.\n'
+    exit 1
 fi
-}
+
+LNOVA=$(which lnova)
+if [ -z "$LNOVA" ];then
+    echo -e '\nThis is a Python Wrapper for Legacy Nova Instances.\nYou will need to install Legacy Novaclient in order to proceed.\n'
+    exit 1
+fi
 
 REMEMBERINFO(){
-
-  API1=$(awk '{print $1}' /tmp/cloudapi.info)
-  API2=$(awk '{print $2}' /tmp/cloudapi.info)
-  API3=$(awk '{print $3}' /tmp/cloudapi.info)
+  API1=$(awk '{print $1}' $INFO)
+  API2=$(awk '{print $2}' $INFO)
+  API3=$(awk '{print $3}' $INFO)
 
 ### This prints the USERNAME and the API-KEY that you specified earlier ----
     echo ''
     echo "Remember You have set the USERNAME : $API1"
     echo "Remember You have set the API-Key  : $API2"
-	if [ "$API3" ];then 
-		echo "The System returned a User DDI of      : $API3"
-	fi
-
+if [ "$API3" ];then
+	echo "The System returned a User DDI of  : $API3"
+fi
 }
 
 GODEFINED(){
 # Go is used to start the script one a Username and API-KEY have been set --
 ### This is a sanity check to make sure that you have set an account ----
-if [ -f /tmp/cloudapi.info ];then
+if [ -f $INFO ];then
 
 	REMEMBERINFO
 
@@ -63,167 +71,38 @@ if [ -f /tmp/cloudapi.info ];then
 fi
 }
 
-case "$1" in
-
-repair)
-SHITTYVERSIONSHTTPLIB2(){
-CHECKHTTPLIB2=`python -c "try:
-    import httplib2
-except ImportError, e:
-    print 'FAIL'
-"`
-if [ "$CHECKHTTPLIB2" == "FAIL" ];then
-echo "The Python Module httplib2 was not found, I am performing a manual installation"
-	cd /tmp/
-	if [ `which curl` ];then
-		echo "using CURL"
-		curl -s -O http://httplib2.googlecode.com/files/httplib2-0.7.1.tar.gz
-				elif [ `which wget` ];then
-					echo "using WGET"
-					wget http://httplib2.googlecode.com/files/httplib2-0.7.1.tar.gz
-						else
-							echo "We are failing because we found no way to proceed."
-							exit 1
-	fi
-echo "Installing httplib2-0.7.1"
-	tar xzf /tmp/httplib2-0.7.1.tar.gz -C /tmp/
-	cd /tmp/httplib2-0.7.1/
-	python /tmp/httplib2-0.7.1/setup.py install
-fi
-}
-
-SHITTYVERSIONSPRETTYTABLE(){
-CHECKPRETTYTABLE=`python -c "try:
-    import prettytable
-except ImportError, e:
-    print 'FAIL'
-"`
-if [ "$CHECKPRETTYTABLE" == "FAIL" ];then 
-echo "The Python Module prettytable was not found, I am performing a manual installation"
-	cd /tmp/
-	if [ `which curl` ];then
-		echo "using CURL"
-		curl -s -O http://pypi.python.org/packages/source/P/PrettyTable/prettytable-0.5.tar.gz
-			elif [ `which wget` ];then
-				echo "using WGET"
-				wget http://pypi.python.org/packages/source/P/PrettyTable/prettytable-0.5.tar.gz
-					else
-						echo "We are failing because we found no way to proceed."
-						exit 1
-	fi
-	tar xzf /tmp/prettytable-0.5.tar.gz
-	cd /tmp/prettytable-0.5/
-	python /tmp/prettytable-0.5/setup.py install
-fi
-}
-REPAIRFOOBAREDMODULES(){
-echo ''
-echo 'Checking for Incompatible Versions of Python Packages.'
-echo ''
-
-if [ -f ~/ShittyModulesHttpLib.txt ];then 
-	rm ~/ShittyModulesHttpLib.txt
-fi
-
-if [ -f ~/ShittyModulesPrettyTable.txt ];then 
-	rm ~/ShittyModulesPrettyTable.txt
-fi
-
-if [ -f /tmp/badPythonDir.txt ];then
-rm /tmp/badPythonDir.txt
-fi
-
-echo "Looking in Known Standard Locations for Python Modules."
-if [ -d /Library/ ];then
-echo '/Library/' >> /tmp/badPythonDir.txt
-fi
-
-if [ -d /opt/local/ ];then 
-echo '/opt/local/' >> /tmp/badPythonDir.txt
-fi
-	
-if [ -d /usr/local/lib/ ];then 
-echo '/usr/local/lib/' >> /tmp/badPythonDir.txt
-fi
-		
-if [ -d /usr/lib/ ];then
-echo '/usr/lib/' >> /tmp/badPythonDir.txt
-fi
-
-if [ -f /tmp/badPythonPurgeList.txt ];then
-rm /tmp/badPythonPurgeList.txt
-fi
-
-echo "Building List of known bad Modules."
-for P1L in {5..8}; do echo "httplib2-0.7.${P1L}*" >> /tmp/badPythonPurgeList.txt;done
-for P2L in {7..9}; do echo "prettytable-0.${P2L}*" >> /tmp/badPythonPurgeList.txt;done
-
-if [ -f ~/BadModules.txt ];then 
-rm ~/BadModules.txt
-fi
-
-echo "Looking for and Removing Bad Modules."
-for BadD in `cat /tmp/badPythonDir.txt`;
-	do 
-		for BadM in `cat /tmp/badPythonPurgeList.txt`;
-			do 
-				find $BadD -name $BadM -exec rm -rf {} \; 
-			done;
-	done; >> ~/BadModules.txt
-
-SHITTYVERSIONSHTTPLIB2 > /dev/null
-SHITTYVERSIONSPRETTYTABLE > /dev/null
-for NOVADELETE in `ls /tmp/ | grep python-nova`;do rm -rf $NOVADELETE; done
-
-if [ -z ~/BadModules.txt ];then
-echo "Record of Purge can be found here : ~/BadModules.txt"
-fi 
-
-echo 'Cleanup Done'
-}
-
-CHECKFORROOT
-REPAIRFOOBAREDMODULES
-;;
-
-where)
-# This will tell you where the Script has been Placed --
-echo "Because you were asking so nice I will tell you where I am."
-echo $SCRIPTLOCATION
-echo "happy now?"
-;;
-
-new)
+CHECKFOROLDPROCESS(){
 # This Function allows for a New USER and API key to be entered --
-clear
-## Before Entering the New User Information the script cleans up any remnants that may have been running ---
+# Before Entering the New User Information the script cleans up any remnants that may have been running ---
 
-### These are defined Variables, they are used to identify the processes that were running ----
-KILLINFO=$( ps aux | grep cloudapi.info.removal | grep bash | awk '{print $2}' )
+# These are defined Variables, they are used to identify the processes that were running ----
+KILLINFO=$( ps aux | grep $IAMWHO.cloudapi.info.removal | grep bash | awk '{print $2}' )
 KILLSLEEP=$( ps aux | grep sleep | grep $SLEEPTIME | awk '{print $2}' )
 
 ### This removes the timed out removal script ----
-if [ -f /tmp/cloudapi.info.removal ];then
-    rm /tmp/cloudapi.info.removal > /dev/null
+if [ -f $INFO.removal ];then
+    rm $INFO.removal > /dev/null
     echo "I hate left overs..."
-	sleep 1
-fi      
+fi
 
 ### This makes sure that the Process PIDs are killed ----
-      if [ "$KILLINFO" ]; then
-        echo "I found some things that need to be stopped before we can continue"
-        echo "If there were more than one set of processes running you will have a nice list at the bottom"
-        for KI in `ps aux | grep cloudapi.info.removal | grep bash | awk '{print $2}'`; do kill -9 $KI > /dev/null; done
-		sleep 2
-      fi
-	if [ "$KILLSLEEP" ]; then
-        echo 'killing sleepy processes'
-        for KS in `ps aux | grep sleep | grep $SLEEPTIME | awk '{print $2}'`; do kill -9 $KS > /dev/null; done
-		sleep 2
-        fi
-echo ''
+if [ "$KILLINFO" ]; then
+    echo -e "\nI found some things that need to be stopped before we can continue\nIf there were more than one set of processes running you will have a nice list at the bottom"
+    for KI in $KILLINFO; do kill -9 $KI > /dev/null; done
+fi
+if [ "$KILLSLEEP" ]; then
+    echo -e "killing sleepy processes\n"
+    for KS in $KILLSLEEP; do kill -9 $KS > /dev/null; done
+fi
+sleep 2
+}
 
-### This is a sanity check to make sure you have specified a USERNAME ---- 
+case "$1" in
+
+new)
+CHECKFOROLDPROCESS
+
+### This is a sanity check to make sure you have specified a USERNAME ----
 if [ -z $2 ];then 
 echo "You have not specified a USERNAME, Please try again"
 exit 1
@@ -239,101 +118,49 @@ exit 1
 TTLFORINFO=$( expr $SLEEPTIME / 60 )
 
 # Bulding API Cookie 
-echo "$2 $3" > /tmp/cloudapi.info
+echo "$2 $3" > $INFO
 	DDI=`kenova ous credentials | awk -F "'" '/tenant/ {print $4}'`
-		echo "$2 $3 $DDI" > /tmp/cloudapi.info
-
+		echo "$2 $3 $DDI" > $INFO
+            chmod 600 $INFO
+clear
 ### Here a notice of what was entered is shown and the username and API-KEY tmp file is created ----
-			echo 'This will allow you to control the Cloud servers from the Command Line...'
-			echo "HAL has saved the declarations to a TMP file located at /tmp/cloudapi.info"
-			echo "The information that you have entered will be saved for $TTLFORINFO Minutes"
-			echo ''
+			echo -e "\nThis will allow you to control the Cloud servers from the Command Line..."
+			echo "HAL has saved the declarations to a TMP file located at $INFO"
+			echo -e "The information that you have entered will be saved for $TTLFORINFO Minutes\n"
 			echo "You have specified the USERNAME to be : $2"
 			echo "You have specified the API KEY  to be : $3"
 		if [ "$DDI" ];then 
 			echo "The System returned a User DDI of     : $DDI"
 		fi
-			echo ''
 			echo "now use the command [ $0 go ] to control your servers"
-			echo "Use [ $0 help ] for a full list of commands"
-			echo ''
+			echo -e "Use [ $0 help ] for a full list of commands\n"
 
 ### The time out script is created in TMP and then loaded as a background process ----
-echo "#!/bin/bash
-sleep $SLEEPTIME 
-rm /tmp/cloudapi.info
-rm /tmp/cloudapi.info.removal
-exit 0" > /tmp/cloudapi.info.removal	
-	chmod +x /tmp/cloudapi.info.removal
-		/tmp/cloudapi.info.removal &
+echo -e "#!/bin/bash\nsleep $SLEEPTIME\nrm $INFO\nrm $INFO.removal\nexit 0" > $INFO.removal
+	chmod +x $INFO.removal
+		$INFO.removal &
 			exit 0
 fi
 ;;
 
 clean)
-# This is a function that will remove an old setup and kill any and all processes that were started by this script --
-
-### These are defined Variables, they are used to identify the processes that were running ----
-KILLINFO=$( ps aux | grep cloudapi.info.removal | grep bash | awk '{print $2}' )
-KILLSLEEP=$( ps aux | grep sleep | grep $SLEEPTIME | awk '{print $2}' )
-
-### This removes the timed out removal script ----
-clear
-echo "Thank you for calling Initech, Please Hold..."
-sleep 1
-if [ -f /tmp/cloudapi.info.removal ];then
-    rm /tmp/cloudapi.info.removal > /dev/null
-    echo "I hate left overs... Especially left over files..."
-
-### This removes the USERNAME and API-KEY tmp file script ----
-    if [ -f /tmp/cloudapi.info ];then
-      echo "Removing old and dirty info"
-      rm /tmp/cloudapi.info
-    fi
-
-### This makes sure that the Process PIDs are killed ----
-      if [ "$KILLINFO" ]; then
-        echo "I found some things that need to be stopped before we can continue"
-        echo "If there were more than one set of processes running you will have a nice list at the bottom"
-        for KI in `ps aux | grep cloudapi.info.removal | grep bash | awk '{print $2}'`; do kill -9 $KI > /dev/null; done
-                sleep 2
-      fi
-        if [ "$KILLSLEEP" ]; then
-        echo 'killing sleepy processes'
-        for KS in `ps aux | grep sleep | grep $SLEEPTIME | awk '{print $2}'`; do kill -9 $KS > /dev/null; done
-                sleep 2
-        fi
-  echo "I really hope you enjoyed your Cleaning Experience, I know I did."
-  echo "Should you need anything else please let me know..."
-  echo ''  
-exit 1
-
-### If there was nothing to do then this will let you know ----
-	else 
-	echo "So there was nothing to clean, Yea I know I am than good..."
-	echo ''
-exit 1
-fi
+CHECKFOROLDPROCESS
+    exit 1
 ;;
 
 help)
 # The help function calls the HELP function of the python-novaclient script --
-
 ### This prints the help section of the script on your screen ----
 clear
-if [ -f /tmp/cloudapi.info ];then
+if [ -f $INFO ];then
 	REMEMBERINFO
 fi
 
-/usr/local/bin/nova help;
+$NOVA help;
 ;;
  
 lus)
-if [ ! `which lnova` ];then
-clear 
-echo -e '\nThis is a Python Wrapper for Legacy Nova Instances.\nYou will need to install Legacy Novaclient in order to proceed.\n'
-exit 1
-fi
+
 GODEFINED
 
 ### If you use the go function it expects other functions too ----
@@ -346,18 +173,14 @@ GODEFINED
                         echo ''
 			echo "AND THEN??? You did not give any arguments, try again..."
 			echo ''
-                        /usr/local/bin/lnova help
+                        $LNOVA help
                         exit 0
 
    fi
 ;;
 
 luk)
-if [ ! `which lnova` ];then
-clear 
-echo -e '\nThis is a Python Wrapper for Legacy Nova Instances.\nYou will need to install Legacy Novaclient in order to proceed.\n'
-exit 1
-fi
+
 GODEFINED
 
 ### If you use the go function it expects other functions too ----
@@ -370,18 +193,14 @@ GODEFINED
                         echo ''
 			echo "AND THEN??? You did not give any arguments, try again..."
 			echo ''
-                        /usr/local/bin/lnova help
+                        $LNOVA help
                         exit 0
 
    fi
 ;;
 
 ous)
-if [ ! `which nova` ];then
-clear 
-echo -e '\nThis is a Python Wrapper for Openstack Nova Instances.\nYou will need to install Openstack-Novaclient in order to proceed.\n'
-exit 1
-fi
+
 GODEFINED
 
 if [ -z "$API3" ];then
@@ -423,18 +242,14 @@ fi
                         echo ''
 			echo "AND THEN??? You did not give any arguments, try again..."
 			echo ''
-                        /usr/local/bin/nova help
+                        $NOVA help
                         exit 0
 
    fi
 ;;
 
 ouk)
-if [ ! `which nova` ];then
-clear 
-echo -e '\nThis is a Python Wrapper for Openstack Nova Instances.\nYou will need to install Openstack-Novaclient in order to proceed.\n'
-exit 1
-fi
+
 GODEFINED
 
 OS_USERNAME="${API1}"
@@ -458,7 +273,7 @@ export OS_USERNAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VERSION NOVA_SERVI
                         echo ''
 			echo "AND THEN??? You did not give any arguments, try again..."
 			echo ''
-                        /usr/local/bin/nova help
+                        $NOVA help
                         exit 0
 
    fi

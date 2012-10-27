@@ -2,8 +2,8 @@
 # - title        : kenova
 # - description  : Installer script for kenova.sh
 # - author       : Kevin Carter
-# - date         : 2012-06-05
-# - version      : 1.4    
+# - date         : 2012-10-25
+# - version      : 1.6
 # - License      : GPLv3
 # - usage        : bash install.sh
 # - notes        : Requires Python, NovaClient; 
@@ -11,372 +11,284 @@
 # - bash_version : >= 3.2.48(1)-release
 #### ========================================= ####
 
-## User Defined ##
+# User Defined Information
 
-# Installer for the python-lnovaclient script
-LNOVAVERSIONGIT="https://github.com/cloudnull/python-lnovaclient.git"
+# Temp Directory
+TEMPDIR="/tmp"
+WHEREAMI=$(pwd)
 
-# Installer for the python-novaclient script
+# Installer Variables for NOVA
 NOVAVERSIONGIT="git://github.com/openstack/python-novaclient.git"
 RAXNOVAVERSIONGIT="https://github.com/rackspace/rackspace-novaclient.git"
+LNOVAVERSIONGIT="https://github.com/cloudnull/python-lnovaclient.git"
+SUPERNOVAGIT="https://github.com/rackerhacker/supernova.git"
+KEYRINGZIP="http://pypi.python.org/packages/source/k/keyring/keyring-0.9.2.zip"
 
-# Temp Directory 
-TEMPDIR="/tmp/"
-LEGACYNOVACLIENTDIR="/tmp/python-lnovaclient"
-OPENSTACKNOVACLIENTDIR="/tmp/python-novaclient"
-RAXNOVACLIENTDIR="/tmp/rackspace-novaclient"
+# Temp Install Directories
+LEGACYNOVACLIENTDIR="$TEMPDIR/python-lnovaclient"
+OPENSTACKNOVACLIENTDIR="$TEMPDIR/python-novaclient"
+RAXNOVACLIENTDIR="$TEMPDIR/rackspace-novaclient"
+SUPERNOVADIR="$TEMPDIR/supernova"
+KEYRINGDIR="$TEMPDIR/keyring-0.9.2"
+KEYRINGNAME="keyring-0.9.2.zip"
 
-CHECKFORROOT(){
-# Root user check for install 
+# File Log
+NOVALOG="$TEMPDIR/Nova.Installation.log"
+BADMODSDIR="badPythonDir.log"
+BADMODSLIST="badPythonPurgeList.log"
+BADMODSREMOVED="BadModules.log"
+
+# Information before Installation
+echo -e "\nYou should know that if you install the nova environment using this script there will be several actions done.\n1 - The installer will clean up known bad python modules that conflict with the nova and lnova scripts.\n2 - If you have any parts of nova or lnova preinstalled, it will be removed.\n3 - Using Git, it will install all of the needed scripts for nova and lnova to work specifically with the Rackspace Openstack and Legacy Environments.\n"
+
+read -p "Please press [ Enter ] To continue. Otherwise press [ CTRL-c ] to quit."
+
+# Root user check for install
 USERCHECK=$( whoami  )
 if [ "$(id -u)" != "0" ]; then
-   echo "This script must be run as ROOT"
-        echo "You have attempted to run this as $USERCHECK"
-                echo "use sudo $0 $1 or change to root."
+   echo -e "This script must be run as ROOT\nYou have attempted to run this as $USERCHECK\nuse sudo $0 $1 or change to root."
    exit 1
 fi
-}
 
-# Installer for the kenova command and control script
-INSTALLKENOVA(){
-	echo -e "\nInstalling the kenova script\n"
-	cp kenova.sh /usr/bin/kenova
-	chmod +x /usr/bin/kenova
-}
-
-SHITTYVERSIONSHTTPLIB2(){
-CHECKHTTPLIB2=`python -c "try:
-    import httplib2
-except ImportError, e:
-    print 'FAIL'
-"`
-if [ "$CHECKHTTPLIB2" == "FAIL" ];then
-echo "The Python Module httplib2 was not found, I am performing a manual installation"
-	cd /tmp/
-	if [ `which curl` ];then
-		echo "using CURL"
-		curl -s -O http://httplib2.googlecode.com/files/httplib2-0.7.1.tar.gz
-				elif [ `which wget` ];then
-					echo "using WGET"
-					wget http://httplib2.googlecode.com/files/httplib2-0.7.1.tar.gz
-						else
-							echo "We are failing because we found no way to proceed."
-							exit 1
-	fi
-echo "Installing httplib2-0.7.1"
-	tar xzf /tmp/httplib2-0.7.1.tar.gz -C /tmp/
-	cd /tmp/httplib2-0.7.1/
-	python /tmp/httplib2-0.7.1/setup.py install
-fi
-}
-
-SHITTYVERSIONSPRETTYTABLE(){
-CHECKPRETTYTABLE=`python -c "try:
-    import prettytable
-except ImportError, e:
-    print 'FAIL'
-"`
-if [ "$CHECKPRETTYTABLE" == "FAIL" ];then 
-echo "The Python Module prettytable was not found, I am performing a manual installation"
-	cd /tmp/
-	if [ `which curl` ];then
-		echo "using CURL"
-		curl -s -O http://pypi.python.org/packages/source/P/PrettyTable/prettytable-0.5.tar.gz
-			elif [ `which wget` ];then
-				echo "using WGET"
-				wget http://pypi.python.org/packages/source/P/PrettyTable/prettytable-0.5.tar.gz
-					else
-						echo "We are failing because we found no way to proceed."
-						exit 1
-	fi
-	tar xzf /tmp/prettytable-0.5.tar.gz
-	cd /tmp/prettytable-0.5/
-	python /tmp/prettytable-0.5/setup.py install
-fi
-}
-
-REPAIRFOOBAREDMODULES(){
-echo ''
-echo 'Checking for Incompatible Versions of Python Packages.'
-echo ''
-
-if [ -f ~/ShittyModulesHttpLib.txt ];then 
-	rm ~/ShittyModulesHttpLib.txt
+if [ ! $(which python) ];then
+clear
+    echo -e "\nThis is a Python Wrapper for a Python application, which requires that you have Python installed.\nYou will need to install Python in order to proceed."
+    exit 1
 fi
 
-if [ -f ~/ShittyModulesPrettyTable.txt ];then 
-	rm ~/ShittyModulesPrettyTable.txt
+if [ ! $(which git) ];then
+clear
+    echo -e "\nGit was not found on this Instance. You should install GIT to ensure compatibility,\nhowever, I can use fall back mode to retrieve the files but it is not guaranteed to work.\nWhile Fall Back mode may work, I would recommend that you install a GIT client on this system before continuing.\n"
+    echo -e "\nPlease go to \"http://git-scm.com/downloads\" and install git on your system.\n"
+    exit 1
 fi
 
-if [ -f /tmp/badPythonDir.txt ];then
-rm /tmp/badPythonDir.txt
+# Move Log to Old if it exists
+if [ -f "$NOVALOG" ];then
+    mv $NOVALOG $NOVALOG.old.$(date +%y%m%d%H%M).log
 fi
 
-echo "Looking in Known Standard Locations for Python Modules."
+echo -e "\nChecking for Incompatible Versions of Python Packages.\n"
+# remove old directory text files if they exist
+if [ -f $TEMPDIR/$BADMODSDIR ];then
+    rm $TEMPDIR/$BADMODSDIR
+fi
+
+
+echo -e "\nLooking in Known Standard Locations for Python Modules.\n"
+# Build a list of directories if they exist
 if [ -d /Library/ ];then
-echo '/Library/' >> /tmp/badPythonDir.txt
+    echo '/Library' >> $TEMPDIR/$BADMODSDIR
 fi
 
 if [ -d /opt/local/ ];then 
-echo '/opt/local/' >> /tmp/badPythonDir.txt
+    echo '/opt/local' >> $TEMPDIR/$BADMODSDIR
 fi
 	
 if [ -d /usr/local/lib/ ];then 
-echo '/usr/local/lib/' >> /tmp/badPythonDir.txt
+    echo '/usr/local/lib' >> $TEMPDIR/$BADMODSDIR
 fi
 		
 if [ -d /usr/lib/ ];then
-echo '/usr/lib/' >> /tmp/badPythonDir.txt
+    echo '/usr/lib' >> $TEMPDIR/$BADMODSDIR
 fi
 
-if [ -f /tmp/badPythonPurgeList.txt ];then
-rm /tmp/badPythonPurgeList.txt
+
+# Build a list of bad Python Modules
+if [ -f $TEMPDIR/$BADMODSLIST ];then
+    rm $TEMPDIR/$BADMODSLIST
 fi
 
-echo "Building List of known bad Modules."
-for P1L in {5..8}; do echo "httplib2-0.7.${P1L}*" >> /tmp/badPythonPurgeList.txt;done
-for P2L in {6..9}; do echo "prettytable-0.${P2L}*" >> /tmp/badPythonPurgeList.txt;done
+echo -e "\nBuilding a list of known bad Python Modules for RAX Nova.\n"
+    for P1L in {6..10}; do echo "httplib2-0.7.$P1L*" >> $TEMPDIR/$BADMODSLIST; done
+    for P2L in {6..10}; do echo "prettytable-0.$P2L*" >> $TEMPDIR/$BADMODSLIST; done
 
-if [ -f ~/BadModules.txt ];then 
-rm ~/BadModules.txt
+echo -e "Looking for and Removing Bad Modules."
+for BadD in $(cat $TEMPDIR/$BADMODSDIR); do
+    for BadM in $(cat $TEMPDIR/$BADMODSLIST); do
+        find $BadD -name $BadM -exec rm -rf {} \;
+        find $BadD -name 'keyring*' -exec rm -rf {} \;
+        find $BadD -name '*python_novaclient*' -exec rm -rf {} \;
+        find $BadD -name '*python_lnovaclient*' -exec rm -rf {} \;
+        find $BadD -name '*rackspace_auth_openstack*' -exec rm -rf {} \;
+        find $BadD -name '*supernova*' -exec rm -rf {} \;
+	done;
+done; >> $TEMPDIR/$BADMODSREMOVED
+
+
+
+if [ -z $TEMPDIR/$BADMODSREMOVED ];then
+    echo "Record of Purge can be found here : $TEMPDIR/$BADMODSREMOVED"
 fi
-
-echo "Looking for and Removing Bad Modules."
-for BadD in `cat /tmp/badPythonDir.txt`;
-	do 
-		for BadM in `cat /tmp/badPythonPurgeList.txt`;
-			do 
-				find $BadD -name $BadM -exec rm -rf {} \; 
-			done;
-	done; >> ~/BadModules.txt
-
-SHITTYVERSIONSHTTPLIB2 > /dev/null
-SHITTYVERSIONSPRETTYTABLE > /dev/null
-for NOVADELETE in `ls /tmp/ | grep python-nova`;do rm -rf $NOVADELETE; done
-
-if [ -z ~/BadModules.txt ];then
-echo "Record of Purge can be found here : ~/BadModules.txt"
-fi 
 
 echo 'Cleanup Done'
-}
 
-if [ ! `which python` ];then
-clear 
-echo 'This is a Python Wrapper, which requires that you have Python installed.'
-echo 'You will need to install Python in order to proceed.'
-exit 1
-fi
 
-CHECKFORROOT
-if [ ! `which git` ];then
-	echo ''
-	echo -e "\nGit was not found on this Instance. You should install GIT to ensure compatibility,\nhowever, I can use fall back mode to retrieve the files but it is not guaranteed to work.\nWhile Fall Back mode may work, I would recommend that you install a GIT client on this system before continuing.\n"
-		exit 1
-fi
+# Install Setup Tools if needed
+PYTHONVERSIONNUMBER=$(python -c 'import sys; print sys.version[:3]')
+SETUPTOOLSVERSION=$(curl -s http://pypi.python.org/pypi/setuptools | grep "http://pypi.python.org/packages/$PYTHONVERSIONNUMBER/" | sed -e 's/<a\ href\=//g' -e 's/\"//g' -e 's/#.*//g' -e 's/^[ ]*//g' | grep -v .exe)
+SETUPTOOLSNAME=$(echo $SETUPTOOLSVERSION | awk -F '/' '{print $8}')
 
-SETUPTOOLSCHECK(){
 echo "Checking for Python Setup Tools"
-CHECKSETUPTOOLS=`python -c "try:
+CHECKSETUPTOOLS=$(python -c "try:
     import setuptools
 except ImportError, e:
     print 'FAIL'
-"`
+")
+
 if [ "$CHECKSETUPTOOLS" == "FAIL" ];then  
-	echo "Setup Tools was not found on your System, I am attempting to install the Python Module.";
-	echo ''
-PYTHONVERSIONNUMBER=`python -c 'import sys; print sys.version[:3]'`
-SETUPTOOLSVERSION=`curl -s http://pypi.python.org/pypi/setuptools | grep "http://pypi.python.org/packages/$PYTHONVERSIONNUMBER/"|sed -e 's/<a\ href\=//g' -e 's/\"//g' -e 's/#.*//g' -e 's/^[ ]*//g'|grep -v .exe`
-SETUPTOOLSNAME=`echo ${SETUPTOOLSVERSION}|awk -F '/' '{print $8}'`
-	if [ -z "$SETUPTOOLSVERSION" ];then 
-		echo "Sorry though your version of Python has no Version of SetupTools Available."
-		echo "Please Goto http://pypi.python.org/pypi/setuptools to see if there is a version available."
-		exit 1 
-	fi
+	echo -e "\nSetup Tools was not found on your System, I am attempting to install the Python Module.\n"
+        if [ -z "$SETUPTOOLSVERSION" ];then
+            echo -e "Sorry though your version of Python has no Version of SetupTools Available.\nPlease Goto http://pypi.python.org/pypi/setuptools to see if\nthere is a version available."
+            exit 1
+        fi
 
-	echo ''
-	echo "1 - I am getting the installation files for python-setuptools."
-	cd /tmp/
-	echo "Installing $SETUPTOOLSNAME"
-	curl -O ${SETUPTOOLSVERSION}
-	sh /tmp/$SETUPTOOLSNAME > ~/SetupTools.Installation.log
-
-fi 
-}
-
-SETUPTOOLSCHECK
-
-if [ `which kenova` ];then
-	echo ''
-	echo "Nothing to do, kenova is alread installed. You can find it here `which kenova`"
-	echo "However I can overwrite it..."
-	echo "Would you like to replace the script?"
-read -p "[ yes ] or [ no ] : " REINSTALLKENOVA
-
-case "${REINSTALLKENOVA}" in 
-yes | YES | Yes )
-INSTALLKENOVA
-;;
-no | NO | No )
-echo "Nothing Done"
-;;
-*)
-echo "We Did not understand your input so I quit..."
-exit 0
-;;
-esac
-echo ''
+echo -e "\nI am getting the installation files for python-setuptools."
+	cd $TEMPDIR/
+        curl -O $SETUPTOOLSVERSION
+            bash $TEMPDIR/$SETUPTOOLSNAME >> $NOVALOG
 fi
 
-if [ ! `which kenova` ];then
-INSTALLKENOVA
-fi
 
-INSTALLNOVACLIENT(){
+# Removing old openstack nova directory
+cd $TEMPDIR
 if [ -d $OPENSTACKNOVACLIENTDIR ];then 
 	rm -rf $OPENSTACKNOVACLIENTDIR
 fi
 
-	echo ''
-	echo "2 - I am getting the installation files for python-novaclient."
-	cd /tmp/
-	echo "Installing Open Cloud $NOVANAME"
-	if [ `which git` ];then
-		if [ -d $OPENSTACKNOVACLIENTDIR ];then 
-			rm -rf $OPENSTACKNOVACLIENTDIR
-		fi
-			git clone ${NOVAVERSIONGIT}
-			git clone ${RAXNOVAVERSIONGIT}
-			else
-				echo "We are failing because we found no way to proceed."
-				exit 1
-	fi
+echo -e "\nI am installating python-novaclient."
+cd $TEMPDIR
+    git clone $NOVAVERSIONGIT
 	
 if [ -f $OPENSTACKNOVACLIENTDIR/tools/pip-requires ];then
 	echo -e "\nFixing pip so that it only installs the known working prettytable module.\npip-requires File Found.\n"
-	if [ `grep -i prettytable $OPENSTACKNOVACLIENTDIR/tools/pip-requires` ];then
-		sed /^prettytable/d $OPENSTACKNOVACLIENTDIR/tools/pip-requires > /tmp/pip-requires.mod
+	if [ $(grep -i prettytable $OPENSTACKNOVACLIENTDIR/tools/pip-requires) ];then
+		sed /^prettytable/d $OPENSTACKNOVACLIENTDIR/tools/pip-requires > $TEMPDIR/pip-requires.mod
 			rm $OPENSTACKNOVACLIENTDIR/tools/pip-requires
-				mv /tmp/pip-requires.mod $OPENSTACKNOVACLIENTDIR/tools/pip-requires
+				mv $TEMPDIR/pip-requires.mod $OPENSTACKNOVACLIENTDIR/tools/pip-requires
 					echo 'prettytable==0.5' >> $OPENSTACKNOVACLIENTDIR/tools/pip-requires
 	fi
 fi
 
 if grep prettytable $OPENSTACKNOVACLIENTDIR/setup.py;then
-		sed 's/prettytable/prettytable==0\.5/g' $OPENSTACKNOVACLIENTDIR/setup.py > /tmp/setup.py
+		sed 's/prettytable/prettytable==0\.5/g' $OPENSTACKNOVACLIENTDIR/setup.py > $TEMPDIR/setup.py
 			rm $OPENSTACKNOVACLIENTDIR/setup.py
-				mv /tmp/setup.py $OPENSTACKNOVACLIENTDIR/setup.py
+				mv $TEMPDIR/setup.py $OPENSTACKNOVACLIENTDIR/setup.py
 fi
 
+# Installing Openstack Nova Client
 cd $OPENSTACKNOVACLIENTDIR
-	python setup.py install > ~/NovaClient.Installation.log
+	python setup.py install >> $NOVALOG
 
-cd $RAXNOVACLIENTDIR
-        python setup.py install >> ~/NovaClient.Installation.log
-
+cd $TEMPDIR
 if [ -d $OPENSTACKNOVACLIENTDIR ];then 
 	rm -rf $OPENSTACKNOVACLIENTDIR
 fi
 
+
+# Removing old rackspace nova directory
+cd $TEMPDIR
+if [ -d $RAXNOVACLIENTDIR ];then
+    rm -rf $RAXNOVACLIENTDIR
+fi
+
+# Installing Rackspace Nova Client Extensions
+echo -e "\nI am installating Rackspace python-novaclient Extensions."
+cd $TEMPDIR
+    git clone $RAXNOVAVERSIONGIT
+
+cd $RAXNOVACLIENTDIR
+    python setup.py install >> $NOVALOG
+
+cd $TEMPDIR
 if [ -d $RAXNOVACLIENTDIR ];then
         rm -rf $RAXNOVACLIENTDIR
 fi
 
 
-}
-
-INSTALLLNOVACLIENT(){
+# Removing old Legacy nova directory
+cd $TEMPDIR
 if [ -d $LEGACYNOVACLIENTDIR ];then 
 	rm -rf $LEGACYNOVACLIENTDIR
+fi
+
+# Installing the Legacy Nova 
+echo -e "\nI am Installing the python-lnovaclient."
+cd $TEMPDIR
+    git clone $LNOVAVERSIONGIT
+
+cd $LEGACYNOVACLIENTDIR
+	python setup.py install >> $NOVALOG
+
+cd $TEMPDIR
+if [ -d $LEGACYNOVACLIENTDIR ];then 
+	rm -rf $LEGACYNOVACLIENTDIR
+fi
+
+
+# Removing old keyring directory
+cd $TEMPDIR
+if [ -d $KEYRINGDIR ];then
+    rm -rf $KEYRINGDIR
+fi
+
+# Removing old zip file
+cd $TEMPDIR
+if [ -f $KEYRINGNAME ];then
+    rm -rf $KEYRINGNAME
+fi
+
+# Installing keyring
+echo -e "\nI am Installing KeyRing."
+cd $TEMPDIR
+
+if [ $(which wget) ];then
+    wget $KEYRINGZIP
+        elif [ $(which curl) ];then
+            curl -s -O $KEYRINGZIP
+fi
+
+tar -xzf $KEYRINGNAME
+    cd $KEYRINGDIR
+        python setup.py install >> $NOVALOG
+
+cd $TEMPDIR
+if [ -d $KEYRINGDIR ];then
+    rm -rf $KEYRINGDIR
 fi
 
 cd $TEMPDIR
-echo -e "\n3 - I am getting the installation files for python-novaclient.\n"
-	echo "Installing Legacy $LNOVANAME"
-	if [ `which git` ];then
-		if [ -d $LEGACYNOVACLIENTDIR ];then 
-			rm -rf $LEGACYNOVACLIENTDIR
-		fi	
-			git clone ${LNOVAVERSIONGIT}
-			else
-				echo "We are failing because we found no way to proceed."
-				exit 1
-	fi
-
-	cd $LEGACYNOVACLIENTDIR
-	python $LEGACYNOVACLIENTDIR/setup.py install >> ~/LNovaClient.Installation.log
-
-if [ -d $LEGACYNOVACLIENTDIR ];then 
-	rm -rf $LEGACYNOVACLIENTDIR
+if [ -f $KEYRINGNAME ];then
+    rm -rf $KEYRINGNAME
 fi
 
-}
 
-if [ `which lnova` ];then
-echo ''
-echo "Nothing to do, Legacy python-novaclient has already been installed."
-echo "However I can overwrite it..."
-echo "Would you like to replace Legacy python-novaclient?"
-read -p "[ yes ] or [ no ] : " REINSTALLLNOVACLIENT
+# Removing old Supernova directory
+cd $TEMPDIR
+if [ -d $SUPERNOVADIR ];then
+    rm -rf $SUPERNOVADIR
+fi
 
-case "${REINSTALLLNOVACLIENT}" in 
-yes | YES | Yes )
-# INSTALLLNOVACLIENT
-;;
+# Installing Supernova
+echo -e "\nI am Installing Supernova."
+cd $TEMPDIR
+    git clone $SUPERNOVAGIT
 
-no | NO | No )
-echo "Nothing Done"
-;;
+cd $SUPERNOVADIR
+    python setup.py install >> $NOVALOG
 
-*)
-echo "We Did not understand your input so I quit..."
+cd $TEMPDIR
+if [ -d $SUPERNOVADIR ];then
+    rm -rf $SUPERNOVADIR
+fi
+
+
+# Installer for the kenova command and control script
+echo -e "\nInstalling the kenova script\n"
+cp -v $WHEREAMI/kenova.sh /usr/bin/kenova >> $NOVALOG
+chmod +x /usr/bin/kenova
+
+
+echo -e "\nThe Log for the installation has been written to :\n$NOVALOG\n"
+
 exit 0
-;;
-esac
-
-echo ''
-fi
-
-if [ ! `which lnova` ];then
-INSTALLLNOVACLIENT
-fi
-
-
-if [ `which nova` ];then
-echo ''
-echo "Nothing to do, Open Cloud python-novaclient has already been installed."
-echo "However I can overwrite it..."
-echo "Would you like to replace Open Cloud python-novaclient?"
-read -p "[ yes ] or [ no ] : " REINSTALLNOVACLIENT
-
-case "${REINSTALLNOVACLIENT}" in 
-yes | YES | Yes )
-INSTALLNOVACLIENT
-;;
-
-no | NO | No )
-echo "Nothing Done"
-;;
-
-*)
-echo "We Did not understand your input so I quit..."
-exit 0
-;;
-esac
-
-echo ''
-fi
-
-if [ ! `which nova` ];then
-INSTALLNOVACLIENT
-fi
-
-REPAIRFOOBAREDMODULES
- 
-echo ''
-echo 'The Log for the installation has been written to :'
-echo '~/NovaClient.Installation.log'
-echo '~/LNovaClient.Installation.log'
-echo ''
-
-exit 1
