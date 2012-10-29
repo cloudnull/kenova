@@ -96,12 +96,13 @@ fi
 if [ "$KILLINFO" ]; then
     echo -e "\nI found some things that need to be stopped before we can continue\nIf there were more than one set of processes running you will have a nice list at the bottom"
     for KI in $KILLINFO; do kill -9 $KI > /dev/null; done
+    sleep 1
 fi
 if [ "$KILLSLEEP" ]; then
     echo -e "killing sleepy processes\n"
     for KS in $KILLSLEEP; do kill -9 $KS > /dev/null; done
+    sleep 1
 fi
-sleep 2
 }
 
 case "$1" in
