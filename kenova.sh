@@ -9,12 +9,14 @@
 # - notes        : Requires Python, NovaClient; 
 # - notes        : While not needed for operation, Git is needed for installation.
 # - bash_version : >= 3.2.48(1)-release
-#### ========================================= ####
-# Defined Variables --
-## Where is the script located ---
+# ================================================================================
+
+# Defined Variables
+
+# Where is the script located
 SCRIPTLOCATION="$0"
 
-## How long show I retain the information, in seconds ---
+# How long show I retain the information, in seconds
 SLEEPTIME="1800"
 
 # User Defined Variables
@@ -41,6 +43,7 @@ fi
 
 LNOVA=$(which lnova)
 if [ -z "$LNOVA" ];then
+clear
     echo -e '\nThis is a Python Wrapper for Legacy Nova Instances.\nYou will need to install Legacy Novaclient in order to proceed.\n'
     exit 1
 fi
@@ -50,7 +53,7 @@ REMEMBERINFO(){
   API2=$(awk '{print $2}' $INFO)
   API3=$(awk '{print $3}' $INFO)
 
-### This prints the USERNAME and the API-KEY that you specified earlier ----
+# This prints the USERNAME and the API-KEY that you specified earlier
     echo ''
     echo "Remember You have set the USERNAME : $API1"
     echo "Remember You have set the API-Key  : $API2"
@@ -60,13 +63,13 @@ fi
 }
 
 GODEFINED(){
-# Go is used to start the script one a Username and API-KEY have been set --
-### This is a sanity check to make sure that you have set an account ----
+# Go is used to start the script one a Username and API-KEY have been set
+# This is a sanity check to make sure that you have set an account
 if [ -f $INFO ];then
 
 	REMEMBERINFO
 
-### If check fails this prints to let you know ----
+# If check fails this prints to let you know
                 else
                         echo 'AND THEN???'
                         echo "You have not set an account., and to use this you need to..."
@@ -78,20 +81,25 @@ fi
 }
 
 CHECKFOROLDPROCESS(){
-# This Function allows for a New USER and API key to be entered --
-# Before Entering the New User Information the script cleans up any remnants that may have been running ---
+# This Function allows for a New USER and API key to be entered
+# Before Entering the New User Information the script cleans up any remnants that may have been running
 
-# These are defined Variables, they are used to identify the processes that were running ----
+# These are defined Variables, they are used to identify the processes that were running
 KILLINFO=$( ps aux | grep $IAMWHO | grep cloudapi.info.removal | grep bash | awk '{print $2}' )
 KILLSLEEP=$( ps aux | grep $IAMWHO | grep sleep | grep $SLEEPTIME | awk '{print $2}' )
 
-### This removes the timed out removal script ----
+# This removes the timed out removal script
+RM=$(which rm)
 if [ -f $INFO.removal ];then
-    rm $INFO.removal > /dev/null
     echo "I hate left overs..."
+    $RM $INFO.removal > /dev/null
+fi
+if [ -f $INFO ];then
+echo "Removing Account Info..."
+$RM $INFO > /dev/null
 fi
 
-### This makes sure that the Process PIDs are killed ----
+# This makes sure that the Process PIDs are killed
 if [ "$KILLINFO" ]; then
     echo -e "\nI found some things that need to be stopped before we can continue\nIf there were more than one set of processes running you will have a nice list at the bottom"
     for KI in $KILLINFO; do kill -9 $KI > /dev/null; done
@@ -109,19 +117,19 @@ case "$1" in
 new)
 CHECKFOROLDPROCESS
 
-### This is a sanity check to make sure you have specified a USERNAME ----
+# This is a sanity check to make sure you have specified a USERNAME
 if [ -z $2 ];then 
 echo "You have not specified a USERNAME, Please try again"
 exit 1
 
-### This is a Sanity check to make sure you have specified a API-KEY ----
-### This also makes sure that the API-KEY is at least 20 characters long ----
+# This is a Sanity check to make sure you have specified a API-KEY 
+# This also makes sure that the API-KEY is at least 20 characters long 
 	elif [ ! $(echo ${3} | wc -c) -gt 20 ];then 
 		echo "Your API-KEY is not long enough or you did not put one, Please try again..."
 		exit 1
 		else
 		
-## This is the translation from seconds to minutes ---
+# This is the translation from seconds to minutes
 TTLFORINFO=$( expr $SLEEPTIME / 60 )
 
 # Bulding API Cookie 
@@ -129,9 +137,9 @@ echo "$2 $3" > $INFO
 	DDI=`kenova ous credentials | awk -F "'" '/tenant/ {print $4}'`
 		echo "$2 $3 $DDI" > $INFO
             chmod 600 $INFO
-clear
-### Here a notice of what was entered is shown and the username and API-KEY tmp file is created ----
-			echo -e "\nThis will allow you to control the Cloud servers from the Command Line..."
+
+# Here a notice of what was entered is shown and the username and API-KEY tmp file is created 
+			echo -e "\n\n\nThis will allow you to control the Cloud servers from the Command Line..."
 			echo "HAL has saved the declarations to a TMP file located at $INFO"
 			echo -e "The information that you have entered will be saved for $TTLFORINFO Minutes\n"
 			echo "You have specified the USERNAME to be : $2"
@@ -142,8 +150,8 @@ clear
 			echo "now use the command [ $0 <FUNCTION> ] to control your servers"
 			echo -e "Use [ $0 help ] for a full list of Functions\n"
 
-### The time out script is created in TMP and then loaded as a background process ----
-echo -e "#!/bin/bash\nsleep $SLEEPTIME\nrm $INFO\nrm $INFO.removal\nexit 0" > $INFO.removal
+# The time out script is created in TMP and then loaded as a background process 
+echo -e "#!/bin/bash\nsleep $SLEEPTIME\n$RM $INFO\n$RM $INFO.removal\nexit 0" > $INFO.removal
 	chmod +x $INFO.removal
 		$INFO.removal &
 			exit 0
@@ -156,9 +164,8 @@ CHECKFOROLDPROCESS
 ;;
 
 help)
-# The help function calls the HELP function of the python-novaclient script --
-### This prints the help section of the script on your screen ----
-clear
+# The help function calls the HELP function of the python-novaclient script
+# This prints the help section of the script on your screen 
 if [ -f $INFO ];then
 	REMEMBERINFO
 fi
@@ -170,11 +177,11 @@ lus)
 
 GODEFINED
 
-### This is a sanity check to make sure you have listed a function ----
+# This is a sanity check to make sure you have listed a function 
    if [ ! -z $2 ];then
         LNOVA --url $V1USIDENTITY --username $API1 --apikey $API2 $2 $3 $4 $5 $6 $7 $8 $9;
 
-### if no function was listed go will let you know and then show the help screen ----
+# if no function was listed go will let you know and then show the help screen 
                 else
                         echo ''
 			echo "AND THEN??? You did not give any arguments, try again..."
@@ -189,11 +196,11 @@ luk)
 
 GODEFINED
 
-### This is a sanity check to make sure you have listed a function ----
+# This is a sanity check to make sure you have listed a function 
    if [ ! -z $2 ];then
         LNOVA --url $V1USIDENTITY --username $API1 --apikey $API2 $2 $3 $4 $5 $6 $7 $8 $9;
 
-### if no function was listed go will let you know and then show the help screen ----
+# if no function was listed go will let you know and then show the help screen 
                 else
                         echo ''
 			echo "AND THEN??? You did not give any arguments, try again..."
@@ -238,11 +245,11 @@ fi
 
 export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VERSION NOVA_SERVICE_NAME OS_TENANT_NAME
 
-### This is a sanity check to make sure you have listed a function ----
+# This is a sanity check to make sure you have listed a function 
    if [ ! -z $3 ];then
         NOVA $3 $4 $5 $6 $7 $8 $9;
 
-### if no function was listed go will let you know and then show the help screen ----
+# if no function was listed go will let you know and then show the help screen 
                 else
                         echo ''
 			echo "AND THEN??? You did not give any arguments, try again..."
@@ -269,12 +276,12 @@ NOVA_SERVICE_NAME=cloudServersOpenStack
 
 export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VERSION NOVA_SERVICE_NAME OS_TENANT_NAME
 
-### If you use the go function it expects other functions too ----
-### This is a sanity check to make sure you have listed a function ----
+# If you use the go function it expects other functions too 
+# This is a sanity check to make sure you have listed a function 
    if [ ! -z $2 ];then
         NOVA $3 $4 $5 $6 $7 $8 $9;
 
-### if no function was listed go will let you know and then show the help screen ----
+# if no function was listed go will let you know and then show the help screen 
                 else
                         echo ''
 			echo "AND THEN??? You did not give any arguments, try again..."
@@ -287,7 +294,7 @@ export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VER
 
 *)
 echo ''
-# This shows all of the usage --
+# This shows all of the usage
 echo "Usage: $0 <EXPRESSION>"
 echo '
 Base Functions :
