@@ -23,6 +23,13 @@ IAMWHO=$(whoami)
 TEMP="/tmp"
 INFO="$TEMP/$IAMWHO.cloudapi.info"
 
+# API Version 1.0 End Point
+V1USIDENTITY="https://identity.api.rackspacecloud.com/v1.0/"
+V1UKIDENTITY="https://lon.identity.api.rackspacecloud.com/v1.0/"
+
+# API Version 2.0 End Point
+V2USIDENTITY="https://identity.api.rackspacecloud.com/v2.0/"
+V2UKIDENTITY="https://lon.identity.api.rackspacecloud.com/v2.0/"
 
 
 # Checking to see that nova and lnova are installed
@@ -163,10 +170,9 @@ lus)
 
 GODEFINED
 
-### If you use the go function it expects other functions too ----
 ### This is a sanity check to make sure you have listed a function ----
    if [ ! -z $2 ];then
-        lnova --url https://auth.api.rackspacecloud.com/v1.0 --username $API1 --apikey $API2 ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10};
+        LNOVA --url $V1USIDENTITY --username $API1 --apikey $API2 $2 $3 $4 $5 $6 $7 $8 $9;
 
 ### if no function was listed go will let you know and then show the help screen ----
                 else
@@ -183,10 +189,9 @@ luk)
 
 GODEFINED
 
-### If you use the go function it expects other functions too ----
 ### This is a sanity check to make sure you have listed a function ----
    if [ ! -z $2 ];then
-        lnova --url https://lon.auth.api.rackspacecloud.com/v1.0 --username $API1 --apikey $API2 ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10};
+        LNOVA --url $V1USIDENTITY --username $API1 --apikey $API2 $2 $3 $4 $5 $6 $7 $8 $9;
 
 ### if no function was listed go will let you know and then show the help screen ----
                 else
@@ -211,10 +216,9 @@ OS_USERNAME="${API1}"
 OS_PASSWORD="${API2}"
 OS_TENANT_NAME="${API3}"
 NOVA_RAX_AUTH=1
-OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
+OS_AUTH_URL="$V2USIDENTITY"
 NOVA_VERSION=2
 NOVA_SERVICE_NAME=cloudServersOpenStack
-export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VERSION NOVA_SERVICE_NAME OS_TENANT_NAME
 
 if [ -z "$2" ];then
 	echo "You need to specify a region, I can't proceed without the region."
@@ -232,10 +236,11 @@ if [ -z "$2" ];then
 
 fi		
 
-### If you use the go function it expects other functions too ----
+export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VERSION NOVA_SERVICE_NAME OS_TENANT_NAME
+
 ### This is a sanity check to make sure you have listed a function ----
    if [ ! -z $3 ];then
-        nova ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10};
+        NOVA $3 $4 $5 $6 $7 $8 $9;
 
 ### if no function was listed go will let you know and then show the help screen ----
                 else
@@ -255,18 +260,19 @@ GODEFINED
 OS_USERNAME="${API1}"
 OS_PASSWORD="${API2}"
 OS_TENANT_NAME="${API3}"
-	OS_REGION_NAME="LON"
 NOVA_RAX_AUTH=1
-OS_AUTH_URL=https://lon.identity.api.rackspacecloud.com/v2.0/
+OS_AUTH_URL="$V2UKIDENTITY"
 NOVA_VERSION=2
 NOVA_SERVICE_NAME=cloudServersOpenStack
-OS_TENANT_NAME=self
-export OS_USERNAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VERSION NOVA_SERVICE_NAME OS_TENANT_NAME
+
+    OS_REGION_NAME="LON"
+
+export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VERSION NOVA_SERVICE_NAME OS_TENANT_NAME
 
 ### If you use the go function it expects other functions too ----
 ### This is a sanity check to make sure you have listed a function ----
    if [ ! -z $2 ];then
-        nova ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10};
+        NOVA $3 $4 $5 $6 $7 $8 $9;
 
 ### if no function was listed go will let you know and then show the help screen ----
                 else
