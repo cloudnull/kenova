@@ -82,8 +82,8 @@ CHECKFOROLDPROCESS(){
 # Before Entering the New User Information the script cleans up any remnants that may have been running ---
 
 # These are defined Variables, they are used to identify the processes that were running ----
-KILLINFO=$( ps aux | grep $IAMWHO.cloudapi.info.removal | grep bash | awk '{print $2}' )
-KILLSLEEP=$( ps aux | grep sleep | grep $SLEEPTIME | awk '{print $2}' )
+KILLINFO=$( ps aux | grep $IAMWHO | grep cloudapi.info.removal | grep bash | awk '{print $2}' )
+KILLSLEEP=$( ps aux | grep $IAMWHO | grep sleep | grep $SLEEPTIME | awk '{print $2}' )
 
 ### This removes the timed out removal script ----
 if [ -f $INFO.removal ];then
