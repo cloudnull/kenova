@@ -43,9 +43,6 @@ The ``kenova`` wrapper has been tested to work on most Linux and Unix systems th
       clean     -- Removes all temp files for user interactions, 
                    This is also done automatically every 30 minutes
 
-  Repair and Upgrade Functions :
-      repair    -- Identifies and Repairs python modules that are know to be incompatible
-
 
 Once you have authenticated with the user name and the API-Key for the account that you want to interact with, simply enter the country that you are authenticated against and the function that you would like to perform.
 
