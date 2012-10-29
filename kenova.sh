@@ -8,7 +8,6 @@
 # - usage        : bash kenova
 # - notes        : Requires Python, NovaClient; 
 # - notes        : While not needed for operation, Git is needed for installation.
-# - notes        : the python-novaclient can be gotten here = https://github.com/openstack/python-novaclient
 # - bash_version : >= 3.2.48(1)-release
 #### ========================================= ####
 # Defined Variables --
@@ -140,8 +139,8 @@ clear
 		if [ "$DDI" ];then 
 			echo "The System returned a User DDI of     : $DDI"
 		fi
-			echo "now use the command [ $0 go ] to control your servers"
-			echo -e "Use [ $0 help ] for a full list of commands\n"
+			echo "now use the command [ $0 <FUNCTION> ] to control your servers"
+			echo -e "Use [ $0 help ] for a full list of Functions\n"
 
 ### The time out script is created in TMP and then loaded as a background process ----
 echo -e "#!/bin/bash\nsleep $SLEEPTIME\nrm $INFO\nrm $INFO.removal\nexit 0" > $INFO.removal
@@ -305,9 +304,6 @@ Usage Functions :
       ouk       -- Used to access Open Cloud UK Cloud Servers
       clean     -- Removes all temp files for user interactions, 
                    This is also done automatically every 30 minutes
-
-Repair Functions :
-      repair    -- This attempts to repair the functions if they were broken
 '
 echo ''
 exit 1
