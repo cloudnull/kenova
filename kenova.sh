@@ -11,7 +11,8 @@
 # - bash_version : >= 3.2.48(1)-release
 # ================================================================================
 
-# Defined Variables
+# Defined
+APICREDFILE=".adminapi"
 
 # Where is the script located
 SCRIPTLOCATION="$0"
@@ -31,6 +32,12 @@ V1UKIDENTITY="https://lon.identity.api.rackspacecloud.com/v1.0/"
 # API Version 2.0 End Point
 V2USIDENTITY="https://identity.api.rackspacecloud.com/v2.0/"
 V2UKIDENTITY="https://lon.identity.api.rackspacecloud.com/v2.0/"
+
+# Admin API FILE, specify the location for the file
+ADMINAPIFILE="$HOME/$APICREDFILE"
+
+
+# =================================================
 
 
 # Checking to see that nova and lnova are installed
@@ -292,15 +299,68 @@ export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VER
    fi
 ;;
 
+admin)
+
+# source Information provided by $ADMINAPIFILE
+
+if [ -z "$2" ];then
+    echo "You need to specify a region, I can't proceed without the region."
+    exit 1
+        else
+if [ -f "$ADMINAPIFILE" ];then
+            ADMINENDPOINT=$(grep "\[$2\]" $ADMINAPIFILE)
+                if [ "$ADMINENDPOINT" ];then
+                    PARSEDFILE=$(sed -n -e "/\[lon\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e '')
+                        if [ "$(echo \"$PARSEDFILE\" | grep 'USE_KEYRING')" ];then
+                            PASSKEY=$(echo $PARSEDFILE | awk -F '=' '{print $2}')
+                            PASSWORD=$(python -c "import keyring;print keyring.get_password('""supernova""', '""$2:NOVA_API_KEY""')")
+                            KEYRINGPARSEDFILE=$(sed -n -e "/\[lon\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e "s/USE_KEYRING/$PASSWORD/g")
+                            export $KEYRINGPARSEDFILE
+                                else
+                                    export $PARSEDFILE
+                        fi
+                    else
+                            echo "The region was not specified or was invalid."
+                            echo "Please try Again."
+                            exit 1
+                fi
+else
+    echo "Admin API config File is not found."
+    exit 1
+fi
+
+fi
+
+export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VERSION NOVA_SERVICE_NAME OS_TENANT_NAME
+
+# If you use the go function it expects other functions too
+# This is a sanity check to make sure you have listed a function
+if [ ! -z $2 ];then
+NOVA $3 $4 $5 $6 $7 $8 $9;
+
+# if no function was listed go will let you know and then show the help screen
+else
+echo ''
+echo "AND THEN??? You did not give any arguments, try again..."
+echo ''
+$NOVA help
+exit 0
+
+fi
+;;
+
 *)
 echo ''
 # This shows all of the usage
 echo "Usage: $0 <EXPRESSION>"
-echo '
+echo -e "
 Base Functions :
       where     -- Tells you where the script is located
 	  
 Usage Functions :
+      admin     -- Used to specify a Username and API Key
+                   |_ Select a region, which is spcified in your \"$ADMINAPIFILE\"
+
       new       -- Used to specify a Username and API Key
       lus       -- Used to access Legacy US Cloud Servers
       luk       -- Used to access Legacy UK Cloud Servers
@@ -311,8 +371,8 @@ Usage Functions :
       ouk       -- Used to access Open Cloud UK Cloud Servers
       clean     -- Removes all temp files for user interactions, 
                    This is also done automatically every 30 minutes
-'
-echo ''
+
+"
 exit 1
 ;;
 
