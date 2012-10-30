@@ -310,11 +310,11 @@ if [ -z "$2" ];then
 if [ -f "$ADMINAPIFILE" ];then
             ADMINENDPOINT=$(grep "\[$2\]" $ADMINAPIFILE)
                 if [ "$ADMINENDPOINT" ];then
-                    PARSEDFILE=$(sed -n -e "/\[lon\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e '')
+                    PARSEDFILE=$(sed -n -e "/\[$2\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e '')
                         if [ "$(echo \"$PARSEDFILE\" | grep 'USE_KEYRING')" ];then
-                            PASSKEY=$(echo $PARSEDFILE | awk -F '=' '{print $2}')
-                            PASSWORD=$(python -c "import keyring;print keyring.get_password('""supernova""', '""$2:NOVA_API_KEY""')")
-                            KEYRINGPARSEDFILE=$(sed -n -e "/\[lon\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e "s/USE_KEYRING/$PASSWORD/g")
+                            PASSKEY=$(echo -e "$PARSEDFILE" | awk -F '=' '/OS_PASSWORD/ || /NOVA_API_KEY/ {print $1}')
+                            PASSWORD=$(python -c "import keyring;print keyring.get_password('""supernova""', '""$2:$PASSKEY""')")
+                            KEYRINGPARSEDFILE=$(sed -n -e "/\[$2\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e "s/USE_KEYRING/$PASSWORD/g")
                             export $KEYRINGPARSEDFILE
                                 else
                                     export $PARSEDFILE
