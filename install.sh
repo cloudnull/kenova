@@ -22,21 +22,22 @@ NOVAVERSIONGIT="git://github.com/openstack/python-novaclient.git"
 RAXNOVAVERSIONGIT="https://github.com/rackspace/rackspace-novaclient.git"
 LNOVAVERSIONGIT="https://github.com/cloudnull/python-lnovaclient.git"
 SUPERNOVAGIT="https://github.com/rackerhacker/supernova.git"
-KEYRINGZIP="http://pypi.python.org/packages/source/k/keyring/keyring-0.9.2.zip"
 
 # Temp Install Directories
 LEGACYNOVACLIENTDIR="$TEMPDIR/python-lnovaclient"
 OPENSTACKNOVACLIENTDIR="$TEMPDIR/python-novaclient"
 RAXNOVACLIENTDIR="$TEMPDIR/rackspace-novaclient"
 SUPERNOVADIR="$TEMPDIR/supernova"
-KEYRINGDIR="$TEMPDIR/keyring-0.9.2"
-KEYRINGNAME="keyring-0.9.2.zip"
+KEYRINGNAME="keyring"
 
 # File Log
 NOVALOG="$TEMPDIR/Nova.Installation.log"
 BADMODSDIR="badPythonDir.log"
 BADMODSLIST="badPythonPurgeList.log"
 BADMODSREMOVED="BadModules.log"
+
+# Commands
+EZINST="easy_install"
 
 # Information before Installation
 echo -e "\nYou should know that if you install the nova environment using this script there will be several actions done.\n1 - The installer will clean up known bad python modules that conflict with the nova and lnova scripts.\n2 - If you have any parts of nova or lnova preinstalled, it will be removed.\n3 - Using Git, it will install all of the needed scripts for nova and lnova to work specifically with the Rackspace Openstack and Legacy Environments.\n"
@@ -226,42 +227,11 @@ if [ -d $LEGACYNOVACLIENTDIR ];then
 fi
 
 
-# Removing old keyring directory
-cd $TEMPDIR
-if [ -d $KEYRINGDIR ];then
-    rm -rf $KEYRINGDIR
-fi
-
-# Removing old zip file
-cd $TEMPDIR
-if [ -f $KEYRINGNAME ];then
-    rm -rf $KEYRINGNAME
-fi
-
 # Installing keyring
 echo -e "\nI am Installing KeyRing."
 cd $TEMPDIR
 
-if [ $(which wget) ];then
-    wget $KEYRINGZIP
-        elif [ $(which curl) ];then
-            curl -s -O $KEYRINGZIP
-fi
-
-tar -xzf $KEYRINGNAME
-    cd $KEYRINGDIR
-        python setup.py install >> $NOVALOG
-
-cd $TEMPDIR
-if [ -d $KEYRINGDIR ];then
-    rm -rf $KEYRINGDIR
-fi
-
-cd $TEMPDIR
-if [ -f $KEYRINGNAME ];then
-    rm -rf $KEYRINGNAME
-fi
-
+$EZINST $KEYRINGNAME >> $NOVALOG
 
 # Removing old Supernova directory
 cd $TEMPDIR
