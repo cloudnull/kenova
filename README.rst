@@ -29,12 +29,12 @@ The ``kenova`` wrapper has been tested to work on most Linux and Unix systems th
 
   Usage: /usr/bin/kenova <EXPRESSION>
 
-Admin Functions :
+  Admin Functions :
     admin-set -- Used for setting a Key Ring Password used with a setup Endpoint.
     admin     -- Used to specify a Username and API Key
                  |_ Select a region, which is spcified in "/Users/CloudNull/.adminapi"
 
-Rackspace Specific Functions :
+  Rackspace Specific Functions :
     new       -- Used to specify a Username and API Key
     lus       -- Used to access Legacy US Cloud Servers
     luk       -- Used to access Legacy UK Cloud Servers
