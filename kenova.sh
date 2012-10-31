@@ -11,8 +11,9 @@
 # - bash_version : >= 3.2.48(1)-release
 # ================================================================================
 
-# Defined
+# Defined admin API file and name
 APICREDFILE=".adminapi"
+KEYNAME="kenova"
 
 # Where is the script located
 SCRIPTLOCATION="$0"
@@ -33,12 +34,10 @@ V1UKIDENTITY="https://lon.identity.api.rackspacecloud.com/v1.0/"
 V2USIDENTITY="https://identity.api.rackspacecloud.com/v2.0/"
 V2UKIDENTITY="https://lon.identity.api.rackspacecloud.com/v2.0/"
 
-# Admin API FILE, specify the location for the file
-ADMINAPIFILE="$HOME/$APICREDFILE"
-
-
 # =================================================
 
+# Admin API FILE, specify the location for the file
+ADMINAPIFILE="$HOME/$APICREDFILE"
 
 # Checking to see that nova and lnova are installed
 NOVA=$(which nova)
@@ -331,7 +330,7 @@ if [ -z "$2" ];then
                         PARSEDFILE=$(sed -n -e "/\[$2\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e '')
                             if [ "$(echo \"$PARSEDFILE\" | grep 'USE_KEYRING')" ];then
                                 PASSKEY=$(echo -e "$PARSEDFILE" | awk -F '=' '/OS_PASSWORD/ || /NOVA_API_KEY/ {print $1}')
-                                PASSWORD=$(python -c "import keyring;print keyring.get_password('""kenova""', '""$2:$PASSKEY""')")
+                                PASSWORD=$(python -c "import keyring;print keyring.get_password('""$KEYNAME""', '""$2:$PASSKEY""')")
                                 KEYRINGPARSEDFILE=$(sed -n -e "/\[$2\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e "s/USE_KEYRING/$PASSWORD/g")
                                 export $KEYRINGPARSEDFILE
                                     else
@@ -345,7 +344,7 @@ if [ -z "$2" ];then
                 else
                     echo "Admin API config File is not found."
                     exit 1
-fi
+            fi
 
 fi
 
