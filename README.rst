@@ -29,19 +29,22 @@ The ``kenova`` wrapper has been tested to work on most Linux and Unix systems th
 
   Usage: /usr/bin/kenova <EXPRESSION>
 
-  Base Functions :
-      where     -- Tells you where the script is located
-          
-  Usage Functions :
-      new       -- Used to specify a Username and API Key
-      lus       -- Used to access Legacy US Cloud Servers
-      luk       -- Used to access Legacy UK Cloud Servers
-      ous       -- Used to access Open Cloud US Cloud Servers,
-                   You have to specify a Region 
-                   Available Regions are : ord & dfw
-      ouk       -- Used to access Open Cloud UK Cloud Servers
-      clean     -- Removes all temp files for user interactions, 
-                   This is also done automatically every 30 minutes
+Admin Functions :
+    admin-set -- Used for setting a Key Ring Password used with a setup Endpoint.
+    admin     -- Used to specify a Username and API Key
+                 |_ Select a region, which is spcified in "/Users/CloudNull/.adminapi"
+
+Rackspace Specific Functions :
+    new       -- Used to specify a Username and API Key
+    lus       -- Used to access Legacy US Cloud Servers
+    luk       -- Used to access Legacy UK Cloud Servers
+    ous       -- Used to access Open Cloud US Cloud Servers,
+                 |_ You have to specify a Region
+                 |_ Available Regions are : ord & dfw
+
+    ouk       -- Used to access Open Cloud UK Cloud Servers
+    clean     -- Removes all temp files for user interactions,
+                 This is also done automatically every 30 minutes
 
 
 Once you have authenticated with the user name and the API-Key for the account that you want to interact with, simply enter the country that you are authenticated against and the function that you would like to perform.

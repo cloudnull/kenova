@@ -119,13 +119,36 @@ if [ "$KILLSLEEP" ]; then
 fi
 }
 
+HELPINFORMATION(){
+echo -e "\nUsage: $0 <EXPRESSION>"
+echo -e "
+Admin Functions :
+    admin-set -- Used for setting a Key Ring Password used with a setup Endpoint.
+    admin     -- Used to specify a Username and API Key
+                 |_ Select a region, which is spcified in \"$ADMINAPIFILE\"
+
+Rackspace Specific Functions :
+    new       -- Used to specify a Username and API Key
+    lus       -- Used to access Legacy US Cloud Servers
+    luk       -- Used to access Legacy UK Cloud Servers
+    ous       -- Used to access Open Cloud US Cloud Servers,
+                 |_ You have to specify a Region
+                 |_ Available Regions are : ord & dfw
+
+    ouk       -- Used to access Open Cloud UK Cloud Servers
+    clean     -- Removes all temp files for user interactions,
+                 This is also done automatically every 30 minutes
+\n"
+}
+
+
 case "$1" in
 
 new)
 CHECKFOROLDPROCESS
 
 # This is a sanity check to make sure you have specified a USERNAME
-if [ -z $2 ];then 
+if [ -z $2 ];then
 echo "You have not specified a USERNAME, Please try again"
 exit 1
 
@@ -171,13 +194,8 @@ CHECKFOROLDPROCESS
 ;;
 
 help)
-# The help function calls the HELP function of the python-novaclient script
-# This prints the help section of the script on your screen 
-if [ -f $INFO ];then
-	REMEMBERINFO
-fi
-
-$NOVA help;
+# This prints the help section of the script on your screen
+HELPINFORMATION
 ;;
  
 lus)
@@ -307,26 +325,26 @@ if [ -z "$2" ];then
     echo "You need to specify a region, I can't proceed without the region."
     exit 1
         else
-if [ -f "$ADMINAPIFILE" ];then
-            ADMINENDPOINT=$(grep "\[$2\]" $ADMINAPIFILE)
-                if [ "$ADMINENDPOINT" ];then
-                    PARSEDFILE=$(sed -n -e "/\[$2\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e '')
-                        if [ "$(echo \"$PARSEDFILE\" | grep 'USE_KEYRING')" ];then
-                            PASSKEY=$(echo -e "$PARSEDFILE" | awk -F '=' '/OS_PASSWORD/ || /NOVA_API_KEY/ {print $1}')
-                            PASSWORD=$(python -c "import keyring;print keyring.get_password('""supernova""', '""$2:$PASSKEY""')")
-                            KEYRINGPARSEDFILE=$(sed -n -e "/\[$2\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e "s/USE_KEYRING/$PASSWORD/g")
-                            export $KEYRINGPARSEDFILE
-                                else
-                                    export $PARSEDFILE
-                        fi
-                    else
+            if [ -f "$ADMINAPIFILE" ];then
+                ADMINENDPOINT=$(grep "\[$2\]" $ADMINAPIFILE)
+                    if [ "$ADMINENDPOINT" ];then
+                        PARSEDFILE=$(sed -n -e "/\[$2\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e '')
+                            if [ "$(echo \"$PARSEDFILE\" | grep 'USE_KEYRING')" ];then
+                                PASSKEY=$(echo -e "$PARSEDFILE" | awk -F '=' '/OS_PASSWORD/ || /NOVA_API_KEY/ {print $1}')
+                                PASSWORD=$(python -c "import keyring;print keyring.get_password('""kenova""', '""$2:$PASSKEY""')")
+                                KEYRINGPARSEDFILE=$(sed -n -e "/\[$2\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d' -e 's/\ //g' -e "s/USE_KEYRING/$PASSWORD/g")
+                                export $KEYRINGPARSEDFILE
+                                    else
+                                        export $PARSEDFILE
+                            fi
+                        else
                             echo "The region was not specified or was invalid."
                             echo "Please try Again."
                             exit 1
-                fi
-else
-    echo "Admin API config File is not found."
-    exit 1
+                    fi
+                else
+                    echo "Admin API config File is not found."
+                    exit 1
 fi
 
 fi
@@ -349,30 +367,36 @@ exit 0
 fi
 ;;
 
+admin-set)
+if [ -z "$2" ];then
+    echo "You need to specify an end point.\n"
+    exit 1
+        else
+            CHECKFOREP=$(grep "\[$2\]" $ADMINAPIFILE)
+            if [ -z "$CHECKFOREP" ];then
+                echo -e "\nI did not find the \"\033[1;35m$2\033[0m\" endpoint\nyou should setup your \"\033[1;35m$ADMINAPIFILE\033[0m\" file accordingly.\n"
+                exit 1
+            fi
+fi
+    if [ -z "$3" ];then
+        echo "You need to specify an environment variable.\n"
+        exit 1
+    fi
+
+echo -e "\n\nYou are setting a password in keyring\n"
+echo -e "You have set an Environment for     :\t\033[1;32m$2\033[0m"
+echo -e "You have set a Password Variable of :\t\033[1;32m$3\033[0m"
+
+read -s -p "Enter Password  : " MYPASSWORD
+
+python -c "import keyring;keyring.set_password('""kenova""','""$2:$3""','""$MYPASSWORD""')"
+
+echo -e "\n\nWe have setup a Key-Ring Password for your Environment \"\033[1;32m$2:$3\033[0m\"\n"
+
+;;
+
 *)
-echo ''
-# This shows all of the usage
-echo "Usage: $0 <EXPRESSION>"
-echo -e "
-Base Functions :
-      where     -- Tells you where the script is located
-	  
-Usage Functions :
-      admin     -- Used to specify a Username and API Key
-                   |_ Select a region, which is spcified in your \"$ADMINAPIFILE\"
-
-      new       -- Used to specify a Username and API Key
-      lus       -- Used to access Legacy US Cloud Servers
-      luk       -- Used to access Legacy UK Cloud Servers
-      ous       -- Used to access Open Cloud US Cloud Servers,
-                   |_ You have to specify a Region 
-                   |_ Available Regions are : ord & dfw
-					
-      ouk       -- Used to access Open Cloud UK Cloud Servers
-      clean     -- Removes all temp files for user interactions, 
-                   This is also done automatically every 30 minutes
-
-"
+HELPINFORMATION
 exit 1
 ;;
 
