@@ -79,19 +79,15 @@ fi
 echo -e "\nLooking in Known Standard Locations for Python Modules.\n"
 # Build a list of directories if they exist
 if [ -d /Library/ ];then
-    echo '/Library' >> $TEMPDIR/$BADMODSDIR
+    echo '/Library/' >> $TEMPDIR/$BADMODSDIR
 fi
 
-if [ -d /opt/local/ ];then 
-    echo '/opt/local' >> $TEMPDIR/$BADMODSDIR
-fi
-	
-if [ -d /usr/local/lib/ ];then 
-    echo '/usr/local/lib' >> $TEMPDIR/$BADMODSDIR
+if [ -d /opt/ ];then
+    echo '/opt/' >> $TEMPDIR/$BADMODSDIR
 fi
 		
-if [ -d /usr/lib/ ];then
-    echo '/usr/lib' >> $TEMPDIR/$BADMODSDIR
+if [ -d /usr/ ];then
+    echo '/usr/' >> $TEMPDIR/$BADMODSDIR
 fi
 
 
@@ -112,6 +108,7 @@ for BadD in $(cat $TEMPDIR/$BADMODSDIR); do
         find $BadD -name '*python_novaclient*' -exec rm -rf {} \;
         find $BadD -name '*python_lnovaclient*' -exec rm -rf {} \;
         find $BadD -name '*rackspace_auth_openstack*' -exec rm -rf {} \;
+        find $BadD -name '*rackspace_novaclient*' -exec rm -rf {} \;
         find $BadD -name '*supernova*' -exec rm -rf {} \;
 	done;
 done; >> $TEMPDIR/$BADMODSREMOVED
