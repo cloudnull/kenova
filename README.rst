@@ -32,7 +32,7 @@ The ``kenova`` wrapper has been tested to work on most Linux and Unix systems th
   Admin Functions :
     admin-set -- Used for setting a Key Ring Password used with a setup Endpoint.
     admin     -- Used to specify a Username and API Key
-                 |_ Select a region, which is spcified in "/Users/CloudNull/.adminapi"
+                 |_ Select a region, which is spcified in "<PATH-TO-YOUR-API-FILE>"
 
   Rackspace Specific Functions :
     new       -- Used to specify a Username and API Key
