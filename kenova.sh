@@ -290,7 +290,7 @@ GODEFINED
 
 OS_USERNAME="${API1}"
 OS_PASSWORD="${API2}"
-OS_TENANT_NAME="${API3}"
+OS_TENANT_NAME="LONUSER"
 NOVA_RAX_AUTH=1
 OS_AUTH_URL="$V2UKIDENTITY"
 NOVA_VERSION=2
@@ -303,7 +303,7 @@ export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VER
 # If you use the go function it expects other functions too 
 # This is a sanity check to make sure you have listed a function 
    if [ ! -z $2 ];then
-        $NOVA $3 $4 $5 $6 $7 $8 $9;
+        $NOVA $2 $3 $4 $5 $6 $7 $8 $9;
 
 # if no function was listed go will let you know and then show the help screen 
                 else
@@ -353,7 +353,7 @@ export OS_USERNAME OS_REGION_NAME NOVA_RAX_AUTH OS_PASSWORD OS_AUTH_URL NOVA_VER
 # If you use the go function it expects other functions too
 # This is a sanity check to make sure you have listed a function
 if [ ! -z $2 ];then
-NOVA $3 $4 $5 $6 $7 $8 $9;
+	$NOVA $2 $3 $4 $5 $6 $7 $8 $9;
 
 # if no function was listed go will let you know and then show the help screen
 else
