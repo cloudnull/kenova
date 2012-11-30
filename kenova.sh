@@ -222,7 +222,7 @@ GODEFINED
 
 # This is a sanity check to make sure you have listed a function 
    if [ ! -z $2 ];then
-        $LNOVA --url $V1USIDENTITY --username $API1 --apikey $API2 $2 $3 $4 $5 $6 $7 $8 $9;
+        $LNOVA --url $V1UKIDENTITY --username $API1 --apikey $API2 $2 $3 $4 $5 $6 $7 $8 $9;
 
 # if no function was listed go will let you know and then show the help screen 
                 else
