@@ -82,10 +82,10 @@ While these were the only "Tested" systems, installation should work on ALL Linu
 
 Drop me a line if you have any questions.
 
-.. _kenova.sh: http://downloads.rackerua.com/tools/kenova.sh
+.. _kenova.sh: https://github.com/cloudnull/kenova
 .. _Python Nova Client On GIT hub: https://github.com/openstack/python-novaclient
 .. _Git Client Download and Information: http://git-scm.com/downloads
 .. _Python from python.org: http://www.python.org/getit/
 .. _Legacy Python-NovaClient: https://github.com/cloudnull/python-lnovaclient
 .. _Openstack Python-NovaClient: https://github.com/openstack/python-novaclient
-.. _Rackspace Python-NovaClient Extensions: https://github.com/rackspace/rackspace-novaclient
+.. _Rackspace Python-NovaClient Extensions: https://pypi.python.org/pypi/rackspace-novaclient/
