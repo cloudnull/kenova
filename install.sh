@@ -216,7 +216,7 @@ if [ -d $SUPERNOVADIR ];then
 fi
 
 # Installing Supernova
-echo -e "\nI am Installing Supernova."
+echo -e "\nI am Installing Supernova. for shits and giggles."
 cd $TEMPDIR
 git clone $SUPERNOVAGIT
 
@@ -231,37 +231,6 @@ fi
 # Install the Rackspace NovaClient from PIP
 $EZINST $RAXNOVACLIENT >> $NOVALOG
 
-function setrc(){
-    if [[ ! $(grep "kenova" $RCFILE) ]];then
-        cat << EOF >> $RCFILE
-
-if [ -f $HOME/.kenova ];
-    source ~/.kenova
-fi
-
-EOF
-    else
-        echo -e "Looks like kenova is already in your RC file, so I did not re-add it"
-    fi
-}
-
-# Installer for the kenova command and control script
-echo -e "\nInstalling the kenova script\n"
-cp -v $WHEREAMI/kenova $HOME/.kenova >> $NOVALOG
-
-if [ -f "$HOME/.bashrc" ];then
-    RCFILE="$HOME/.bashrc"
-    setrc
-elif [ -f "$HOME/.profile" ];then
-    RCFILE="$HOME/.profile"
-    setrc
-elif [ -f "$HOME/.bash_profile" ];then
-    RCFILE="$HOME/.bash_profile"
-    setrc
-else
-    echo 'I could not file the RC file for setting Kenova, thus you have to do it yourself.'
-fi
-
-echo -e "\nThe Log for the installation has been written to :\n$NOVALOG\n"
+echo -e "\nThe Log for the installation has been written to :\n$NOVALOG\n\nNow add the source to your environment RC file with command \n\nsetrc.sh\n\n"
 
 exit 0
