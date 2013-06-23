@@ -2,8 +2,8 @@
 # - title        : kenova
 # - description  : Installer script for kenova.sh
 # - author       : Kevin Carter
-# - date         : 2012-10-25
-# - version      : 1.6
+# - date         : 2013-06-23
+# - version      : 1.7
 # - License      : GPLv3
 # - usage        : bash install.sh
 # - notes        : Requires Python, NovaClient;
@@ -21,7 +21,7 @@ WHEREAMI=$(pwd)
 NOVAVERSIONGIT="git://github.com/openstack/python-novaclient.git"
 RAXNOVAVERSIONGIT="https://github.com/rackspace/rackspace-novaclient.git"
 LNOVAVERSIONGIT="https://github.com/cloudnull/python-lnovaclient.git"
-SUPERNOVAGIT="https://github.com/rackerhacker/supernova.git"
+SUPERNOVAGIT="https://github.com/major/supernova.git"
 
 # Temp Install Directories
 LEGACYNOVACLIENTDIR="$TEMPDIR/python-lnovaclient"
@@ -46,7 +46,7 @@ echo -e "\nYou should know that if you install the nova environment using this s
 read -p "Please press [ Enter ] To continue. Otherwise press [ CTRL-c ] to quit."
 
 # Root user check for install
-USERCHECK=$( whoami  )
+USERCHECK=$( whoami )
 if [ "$(id -u)" != "0" ]; then
    echo -e "This script must be run as ROOT\nYou have attempted to run this as $USERCHECK\nuse sudo $0 $1 or change to root."
    exit 1
@@ -129,7 +129,7 @@ echo "Checking for Python Setup Tools"
 CHECKSETUPTOOLS=$(python -c "
 try:
     import setuptools
-except ImportError, e:
+except ImportError:
     print 'FAIL'
 ")
 
@@ -233,10 +233,37 @@ fi
 # Install the Rackspace NovaClient from PIP
 $EZINST $RAXNOVACLIENT >> $NOVALOG
 
+function setrc(){
+    if [[ ! $(grep "kenova" $RCFILE) ]];then
+        cat << EOF >> $RCFILE
+
+if [ -f $HOME/.kenova ];
+    source ~/.kenova
+fi
+
+EOF
+    else
+        echo -e "Looks like kenova is already in your RC file, so I did not re-add it"
+    fi
+}
+
 # Installer for the kenova command and control script
 echo -e "\nInstalling the kenova script\n"
-cp -v $WHEREAMI/kenova.sh /usr/bin/kenova >> $NOVALOG
-chmod +x /usr/bin/kenova
+cp -v $WHEREAMI/kenova $HOME/.kenova >> $NOVALOG
+
+if [ -f "$HOME/.bashrc" ];then
+    RCFILE="$HOME/.bashrc"
+    setrc
+elif [ -f "$HOME/.profile" ];then
+    RCFILE="$HOME/.profile"
+    setrc
+elif [ -f "$HOME/.bash_profile" ];then
+    RCFILE="$HOME/.bash_profile"
+    setrc
+else
+    echo 'I could not file the RC file for setting Kenova, thus you have to do it yourself.'
+fi
+
 echo -e "\nThe Log for the installation has been written to :\n$NOVALOG\n"
 
 exit 0
