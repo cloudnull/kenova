@@ -1,15 +1,13 @@
-#!/bin/bash
-# - title        : kenova
-# - description  : Installer script for kenova.sh
-# - author       : Kevin Carter
-# - date         : 2013-06-23
-# - version      : 1.7
-# - License      : GPLv3
-# - usage        : bash install.sh
-# - notes        : Requires Python, NovaClient;
-# - notes        : Git is needed for installation.
-# - bash_version : >= 3.2.48(1)-release
-#### ========================================= ####
+#!/usr/bin/env bash
+# ==============================================================================
+# Copyright [2013] [Kevin Carter]
+# License Information :
+# This software has no warranty, it is provided 'as is'. It is your
+# responsibility to validate the behavior of the routines and its accuracy using
+# the code provided. Consult the GNU General Public license for further details
+# (see GNU General Public License).
+# http://www.gnu.org/licenses/gpl.html
+# ==============================================================================
 
 # User Defined Information
 
