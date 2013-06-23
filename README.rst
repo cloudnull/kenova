@@ -1,17 +1,20 @@
 kenova
 ^^^^^^
 
-What the kenova.sh script does is create a wrapper script for the python nova client, which simplifies the users interactions with the python-novaclient.  The script is FULL Featured and works with the Rackspace Cloud in all Active environments.  This includes :
+What the kenova.sh script does is create a wrapper script for the python nova client, which simplifies the users interactions with the python-novaclient.  The script is FULL Featured and works with the Rackspace Cloud in all Active environments.  
 
-* US Cloud Servers
-* US Open Cloud Servers
-* UK Cloud Servers
-* UK Open Cloud Servers 
+This includes :
+
+  * US Cloud Servers
+  * US Open Cloud Servers
+  * UK Cloud Servers
+  * UK Open Cloud Servers
+  * SYD Open Cloud Servers
+
 
 Now Supported is also Cloud Networks as well as Cloud Block Storage.
 
-
-The python Nova Client is a powerful python based tool that can assist in A LOT of Openstack / Rackspace Cloud Functions.  When you interface with python-nova-client you are using some fantastic libraries that extend the functionality of the Cloud.  
+The python Nova Client is a powerful python based tool that can assist in A LOT of Openstack / Rackspace Cloud Functions.  When you interface with python-nova-client you are using some fantastic libraries that extend the functionality of the Cloud.
 
 Please have a look here to review the work done by many other very bright people. Please review the `Python Nova Client On GIT hub`_\.
 
@@ -21,7 +24,7 @@ You need to have both ``Python`` and ``Git`` installed.  These two applications 
 * `Git Client Download and Information`_
 * `Python from python.org`_
 
-The ``kenova`` wrapper has been tested to work on most Linux and Unix systems that have Python 2.5+ install and are compatibile with the Python NovaClient modules..
+The ``kenova`` wrapper has been tested to work on most Linux and Unix systems that have Python 2.5+ install and are compatibile with the Python NovaClient modules.
 
 ``Here are the Basic Functions of the application :``
 
@@ -30,24 +33,17 @@ The ``kenova`` wrapper has been tested to work on most Linux and Unix systems th
   Usage: /usr/bin/kenova <EXPRESSION>
 
   Admin Functions :
-    admin-set -- Used for setting a Key Ring Password used with a setup Endpoint.
+    set       -- Used for setting a Key Ring Password used with a setup Endpoint.
     admin     -- Used to specify a Username and API Key
-                 |_ Select a region, which is spcified in "<PATH-TO-YOUR-API-FILE>"
+                 \_ Select a region, which is spcified in "[PATH-TO-YOUR-API-FILE]"
+    new       -- Used to specify a Username and API Key
 
   Rackspace Specific Functions :
-    new       -- Used to specify a Username and API Key
-    lus       -- Used to access Legacy US Cloud Servers
-    luk       -- Used to access Legacy UK Cloud Servers
-    ous       -- Used to access Open Cloud US Cloud Servers,
-                 |_ You have to specify a Region
-                 |_ Available Regions are : ord & dfw
-
-    ouk       -- Used to access Open Cloud UK Cloud Servers
-    clean     -- Removes all temp files for user interactions,
-                 This is also done automatically every 30 minutes
+    [region]  -- Specific Region to use, [ord, dfw, syd, lon]
+    leg       -- The Legacy Region to use
 
 
-Once you have authenticated with the user name and the API-Key for the account that you want to interact with, simply enter the country that you are authenticated against and the function that you would like to perform.
+Once you have authenticated with the user name and the API-Key for the account that you want to interact with, simply enter the region that you are authenticated against and the function that you would like to perform.
 
 Once you have the script you will need to install it
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -63,26 +59,23 @@ Here are the three repositories that are installed when using the scripted insta
 
     sudo bash install.sh
 
-Once installed it is part of the ``$PATH`` you can verify that with the `which` command
+You should know that the Application installation is not needed. If you would like to simply add the kenova functionality to your system you may source the `kenova` file in your `.bashrc` or if you are on a Mac, use the `.profile`
 
-.. code-block:: bash
-
-    which kenova
-
-After you have installed the script you can simply execute the ``kenova`` command from the CLI and begin managing / monitoring your cloud servers more efficiently. 
+The installer is simply an application which installs the dependencies for Kenova. This also Sets up your system to use Lnova which is a customized nova client used for accessing Legacy Rackspace Cloud Servers.
+After you have installed the script you can simply execute the ``kenova`` command from the CLI and begin managing / monitoring your cloud servers more efficiently.
 
 Installation has been tested on :
   * Mac OS X 10.5 +
-  * Ubuntu 10.04 + 
-  * CentOS 5 + 
-  * Debian 6  
+  * Ubuntu 10.04 +
+  * CentOS 5 +
+  * Debian 6
   * Mageia 2
 
 While these were the only "Tested" systems, installation should work on ALL Linux Unix Systems, provided you have the python NovaClient.  
 
 Drop me a line if you have any questions.
 
-.. _kenova.sh: https://github.com/cloudnull/kenova
+.. _kenova: https://github.com/cloudnull/kenova
 .. _Python Nova Client On GIT hub: https://github.com/openstack/python-novaclient
 .. _Git Client Download and Information: http://git-scm.com/downloads
 .. _Python from python.org: http://www.python.org/getit/
