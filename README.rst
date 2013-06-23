@@ -36,11 +36,11 @@ The ``kenova`` wrapper has been tested to work on most Linux and Unix systems th
     set       -- Used for setting a Key Ring Password used with a setup Endpoint.
     admin     -- Used to specify a Username and API Key
                  \_ Select a region, which is spcified in "[PATH-TO-YOUR-API-FILE]"
+                 [-l], [--list] for all available Environments
     new       -- Used to specify a Username and API Key
 
   Rackspace Specific Functions :
-    [region]  -- Specific Region to use, [ord, dfw, syd, lon]
-    leg       -- The Legacy Region to use
+    [region]  -- Specific Region to use, [ord, dfw, syd, lon, luk, lus]
 
 
 Once you have authenticated with the user name and the API-Key for the account that you want to interact with, simply enter the region that you are authenticated against and the function that you would like to perform.
