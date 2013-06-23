@@ -98,7 +98,8 @@ Here are the three repositories that are installed when using the scripted insta
 You should know that the Application installation is not needed. If you would like to simply add the kenova functionality to your system you may source the `kenova` file in your `.bashrc` or if you are on a Mac, use the `.profile`
 
 The installer is simply an application which installs the dependencies for Kenova. This also Sets up your system to use Lnova which is a customized nova client used for accessing Legacy Rackspace Cloud Servers.
-After you have installed the script you can simply execute the ``kenova`` command from the CLI and begin managing / monitoring your cloud servers more efficiently.
+After you have installed the dependencies, run the ``setrc.sh`` sciprt which will complete the installation and copy the functions to your home folder.
+To use the application simply execute the ``kenova`` command from the CLI and begin managing / monitoring your cloud servers more efficiently.
 
 Installation has been tested on :
   * Mac OS X 10.5 +
