@@ -1,37 +1,43 @@
 function kenova(){
-
-  ADMINAPIFILE=".supernova"
+  ADMINAPIFILE="$HOME/.supernova"
+  function helpinfo(){
+    echo -e "\nUsage: $0 <EXPRESSION>\n
+    Admin Functions :
+        set       -- Used for setting a Key Ring Password used with a setup Endpoint.
+        admin     -- Used to specify a Username and API Key
+                     \_ Select a region, which is spcified in \"$ADMINAPIFILE\"
+                     [-l], [--list] for all available Environments
+        new       -- Used to specify a Username and API Key for impersonation\n
+    Rackspace Specific Functions :
+        [region]  -- Specific Region to use, [ord, dfw, syd, lon, luk, lus]
+    \n"
+  }
 
   function runnova(){
-      if [[ "$1" == "lus" || "$1" == "luk" ]];then
-        export NOVA_URL=$V1IDENTITY
-        shift; lnova $@
-      else
-        export OS_AUTH_URL=$IDENTITY
-        nova $@
-      fi
+    if [[ "$1" == "lus" || "$1" == "luk" ]];then
+      export NOVA_URL=$V1IDENTITY
+      shift; lnova $@
+    else
+      export OS_AUTH_URL=$IDENTITY
+      nova $@
+    fi
   }
-  
+
   function line(){
-    echo -e "================================================================\n"
+    echo -e "===============================================================\n"
   }
-  
+
   function envunset(){
-    unset IDENTITY V1IDENTITY NOVA_SERVICE_NAME NOVA_URL NOVA_VERSION NOVA_REGION_NAME NOVACLIENT_INSECURE NOVA_USERNAME NOVA_PASSWORD OS_AUTH_URL OS_USERNAME OS_API_KEY OS_PASSWORD OS_TENANT_NAME NOVA_PROJECT_ID OS_AUTH_SYSTEM OS_REGION_NAME PASSWORD PASSKEY
+    unset IDENTITY V1IDENTITY NOVA_SERVICE_NAME NOVA_URL NOVA_VERSION NOVA_REGION_NAME NOVACLIENT_INSECURE NOVA_USERNAME NOVA_PASSWORD
+    unset OS_USERNAME OS_API_KEY OS_PASSWORD OS_TENANT_NAME NOVA_PROJECT_ID OS_AUTH_SYSTEM OS_REGION_NAME OS_AUTH_URL PASSWORD PASSKEY
   }
 
   function envset(){
-    export NOVA_VERSION=2
-    export NOVA_SERVICE_NAME=cloudServersOpenStack
-    export OS_AUTH_SYSTEM="rackspace"
-    export OS_USERNAME=$OS_USER_USERNAME
-    export NOVA_USERNAME=$OS_USERNAME
-    export OS_PASSWORD=$OS_USER_PASSWORD
-    export NOVA_PASSWORD=$OS_PASSWORD
-    export OS_TENANT_NAME=$OS_USER_USERNAME
-    export NOVA_PROJECT_ID=$OS_TENANT_NAME
+    ENVS1='NOVA_VERSION=2 NOVA_SERVICE_NAME=cloudServersOpenStack OS_AUTH_SYSTEM="rackspace" OS_USERNAME=$OS_USER_USERNAME'
+    ENVS2='NOVA_USERNAME=$OS_USERNAME OS_PASSWORD=$OS_USER_PASSWORD NOVA_PASSWORD=$OS_PASSWORD OS_TENANT_NAME=$OS_USER_USERNAME NOVA_PROJECT_ID=$OS_TENANT_NAME'
+    for env in $ENVS1 $ENVS2; do export $i; done
   }
-  
+
   function setkeyring(){
     python -c "import keyring; keyring.set_password('""kenova""','""$ENV:$ENVVAR""','""$MYPASSWORD""')"
   }
@@ -39,7 +45,7 @@ function kenova(){
   function getkeyring(){
     python -c "import keyring;print keyring.get_password('""kenova""', '""$ENV:$PASSKEY""')"
   }
-  
+
   function keyring(){
     ENV=$2
     ENVVAR=$3
@@ -68,22 +74,26 @@ case "$1" in
     export OS_USER_PASSWORD=$3
   ;;
   admin)
-    line
-    echo "Accessing Admin Methods for $2 from $ADMINAPIFILE"
-    line
-    ENV=$2
-    for env in $(sed -n -e '/^#/d' -e "/\[$ENV\]/,/^$/p" $HOME/$ADMINAPIFILE | sed -e '/^\[/d'); do
-      if [ $(echo $env | grep "USE_KEYRING") ]; then
-        PASSKEY=$(awk -F '=' '/OS_PASSWORD/ || /NOVA_API_KEY/ {print $1}' $env)
-        PASSWORD=getkeyring
-        export $PASSKEY=$PASSWORD
-      else
-        export $env;
-      fi
-    done;
-    shift 2
-    runnova $@
-    envunset
+    if [[ "$2" == "--list" || "$2" == "-l" ]];then
+      ENVS=$(grep "\[.*\]" $ADMINAPIFILE | sed 's/\[//;s/\]//')
+      for env in $ENVS; do
+        echo -e "==> \033[1;32m$env\033[0m <=="; sed -n -e '/^#/d' -e "/\[$env\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d'
+      done
+    else
+      ENV=$2
+      line; echo "Accessing Admin Methods for $2 from $ADMINAPIFILE"; line
+      for env in $(sed -n -e '/^#/d' -e "/\[$ENV\]/,/^$/p" $ADMINAPIFILE | sed -e '/^\[/d'); do
+        if [ $(echo $env | grep "USE_KEYRING") ]; then
+          PASSKEY=$(awk -F '=' '/OS_PASSWORD/ || /NOVA_API_KEY/ {print $1}' $env)
+          PASSWORD=getkeyring
+          export $PASSKEY=$PASSWORD
+        else
+          export $env
+          IDENTITY=$OS_AUTH_URL
+        fi
+      done;
+      shift 2; runnova $@; envunset
+    fi
   ;;
   set)
     keyring $@
@@ -92,23 +102,27 @@ case "$1" in
     envset
     export OS_REGION_NAME="$1"
     line
-    echo -e "You are presently impersonating: $OS_USER_USERNAME in $OS_REGION_NAME"
-    line
-    if [[ "$OS_REGION_NAME" == "ord" || "$OS_REGION_NAME" == "dfw" || "$OS_REGION_NAME" == "syd"  ]];then
-      IDENTITY="https://identity.api.rackspacecloud.com/v2.0/"
-      shift 1; runnova $@
-    elif [ "$OS_REGION_NAME" == "lon" ];then
-      IDENTITY="https://lon.identity.api.rackspacecloud.com/v2.0/"
-      shift 1; runnova $@
-    elif [ "$OS_REGION_NAME" == "lus" ];then
-      V1IDENTITY="https://identity.api.rackspacecloud.com/v1.0/"
-      runnova $@
-    elif [ "$OS_REGION_NAME" == "luk" ];then
-      V1IDENTITY="https://lon.identity.api.rackspacecloud.com/v1.0/"
-      runnova $@
+    if [[ "$OS_REGION_NAME" == "--help" || "$OS_REGION_NAME" == "-h" ]];then
+      helpinfo
     else
-      echo "No Valid Option Provided"
+      echo -e "You are presently impersonating: \"$OS_USER_USERNAME\" in \"$OS_REGION_NAME"\"
       line
+      if [[ "$OS_REGION_NAME" == "ord" || "$OS_REGION_NAME" == "dfw" || "$OS_REGION_NAME" == "syd"  ]];then
+        IDENTITY="https://identity.api.rackspacecloud.com/v2.0/"
+        shift 1; runnova $@
+      elif [ "$OS_REGION_NAME" == "lon" ];then
+        IDENTITY="https://lon.identity.api.rackspacecloud.com/v2.0/"
+        shift 1; runnova $@
+      elif [ "$OS_REGION_NAME" == "lus" ];then
+        V1IDENTITY="https://identity.api.rackspacecloud.com/v1.0/"
+        runnova $@
+      elif [ "$OS_REGION_NAME" == "luk" ];then
+        V1IDENTITY="https://lon.identity.api.rackspacecloud.com/v1.0/"
+        runnova $@
+      else
+        echo "No Valid Option Provided"
+        helpinfo
+      fi
     fi
     envunset
   ;;
