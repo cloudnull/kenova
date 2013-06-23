@@ -25,7 +25,7 @@ EOF
 
 # Installer for the kenova command and control script
 echo -e "\nInstalling the kenova script\n"
-cp -v $WHEREAMI/kenova $HOME/.kenova >> $NOVALOG
+cp -v kenova $HOME/.kenova
 
 if [ -f "$HOME/.bashrc" ];then
     RCFILE="$HOME/.bashrc"

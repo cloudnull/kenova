@@ -64,6 +64,23 @@ This can be done in ONE simple step
 Basically locate the old script with what ever you chose and then remove it. Done.
 
 
+Ponder
+======
+
+If you have all the dependencies that are required and do not want to re-install things, you can simply run the ``setrc.sh`` script or add the following to your Shell RC file and copy the kenova file to the root of your home directory.
+
+.. code-block:: bash
+
+  if [ -f "$HOME/.kenova" ];then
+    source .kenova
+  fi
+
+
+.. code-block:: bash
+
+  cp kenova ~/.kenova
+
+
 Continue
 ========
 
