@@ -1,7 +1,7 @@
 kenova
 ^^^^^^
 
-What the kenova.sh script does is create a wrapper script for the python nova client, which simplifies the users interactions with the python-novaclient.  The script is FULL Featured and works with the Rackspace Cloud in all Active environments.  
+What the kenova source file does is create a wrapper function for the python nova client, which simplifies the users interactions with the python-novaclient.  The script is FULL Featured and works with the Rackspace Cloud in all Active environments.  
 
 This includes :
 
@@ -47,6 +47,25 @@ Once you have authenticated with the user name and the API-Key for the account t
 
 Once you have the script you will need to install it
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+STOP
+====
+
+If you have installed Previous Versions of Kenova, then you will need to locate the old script and remove it.
+
+This can be done in ONE simple step
+
+.. code-block:: bash
+
+    sudo rm $(which kenova)
+
+
+Basically locate the old script with what ever you chose and then remove it. Done.
+
+
+Continue
+========
 
 Install the wrapper, which will download the latest Python-NovaClient from the folks at Openstack. This will also install the package Python-LNovaClient which is an adaptation of the openstack client which provides functionality for the Legacy Rackspace Cloud. Additionally the installer will get and install the Rackspace Nova Extensions which provide more capability for the Python-NovaClient.  
 
