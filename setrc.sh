@@ -13,7 +13,7 @@ function setrc(){
     if [[ ! $(grep "kenova" $RCFILE) ]];then
         cat << EOF >> $RCFILE
 
-if [ -f $HOME/.kenova ];
+if [ -f $HOME/.kenova ];then
     source ~/.kenova
 fi
 
