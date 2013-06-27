@@ -52,14 +52,14 @@ fi
 EZINST="$(which pip) install --upgrade"
 
 # Information before Installation
-echo -e "
+if [[ ! "$FORCE" == "-f" ]];then
+    echo "
 You should know that if you install the nova environment using this script global actions will be performed.
 
 1 - Using Git, it will install all of the needed parts of nova and lnova to
     work specifically with the Rackspace Openstack and Legacy Environments.
 
 "
-if [[ ! "$FORCE" == "-f" ]];then
     read -p "Type [ YES ] To continue. Otherwise press the script will quit. : " CONFIRM
     if [[ ! "${CONFIRM}" == [yY][eE][sS] ]];then
         echo "Exiting." 1>&2
