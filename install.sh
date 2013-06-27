@@ -12,30 +12,19 @@
 #set -u
 #set -e
 
-# Temp Directory
-TMPDIR=$(mktemp -d)
+# Temp Directory, This is Done like this because of OSX
+TMPDIR=$(mktemp -d XXXXXXXXXXX)
 
 # Installer Variables for NOVA
 NOVAVERSIONGIT="git://github.com/openstack/python-novaclient.git"
 RAXNOVAVERSIONGIT="https://github.com/rackerlabs/rackspace-novaclient"
 LNOVAVERSIONGIT="https://github.com/cloudnull/python-lnovaclient.git"
 SUPERNOVAGIT="https://github.com/major/supernova.git"
-
-# Temp Install Directories
-RAXNOVACLIENT="rackspace-novaclient"
 KEYRINGNAME="keyring"
-
-LEGACYNOVACLIENTDIR="$TMPDIR/python-lnovaclient"
-OPENSTACKNOVACLIENTDIR="$TMPDIR/python-novaclient"
-RAXNOVACLIENTDIR="$TMPDIR/$RAXNOVACLIENT"
-SUPERNOVADIR="$TMPDIR/supernova"
 
 # File Log
 NOVALOG="$TMPDIR/Nova.Installation.log"
-BADMODSDIR="badPythonDir.log"
-BADMODSLIST="badPythonPurgeList.log"
-BADMODSREMOVED="BadModules.log"
-
+echo $NOVALOG
 # Test for setuptools
 if ! python -c 'import setuptools' &>/dev/null; then
     echo "Setup Tools was not found on your system" 1>&2
@@ -87,28 +76,6 @@ for module in keyring novaclient rackspace_auth_openstack supernova; do
 done
 
 echo -e "\nI am Installing the nova clients."
-#cd "${TMPDIR}"
-#git clone $NOVAVERSIONGIT
-#if [ -f "$OPENSTACKNOVACLIENTDIR/tools/pip-requires" ];then
-#    echo -e "Making a Modification to the package requires information so that the system is legacy compatible"
-#    if [ $(grep -i prettytable "$OPENSTACKNOVACLIENTDIR/tools/pip-requires") ];then
-#        sed /^prettytable/d "$OPENSTACKNOVACLIENTDIR/tools/pip-requires" > "$TMPDIR/pip-requires.mod"
-#        rm "$OPENSTACKNOVACLIENTDIR/tools/pip-requires"
-#        mv "$TMPDIR/pip-requires.mod" "$OPENSTACKNOVACLIENTDIR/tools/pip-requires"
-#        echo 'prettytable==0.5' >> $OPENSTACKNOVACLIENTDIR/tools/pip-requires
-#    fi
-#fi
-#
-#if grep prettytable $OPENSTACKNOVACLIENTDIR/setup.py;then
-#    sed 's/prettytable/prettytable==0\.5/g' $OPENSTACKNOVACLIENTDIR/setup.py > $TMPDIR/setup.py
-#    rm "$OPENSTACKNOVACLIENTDIR/setup.py"
-#    mv "$TMPDIR/setup.py" "$OPENSTACKNOVACLIENTDIR/setup.py"
-#fi
-
-## Installing Openstack Nova Client
-#cd "$OPENSTACKNOVACLIENTDIR"
-#python setup.py install >> $NOVALOG
-
 ${EZINST} git+${NOVAVERSIONGIT} >> ${NOVALOG}
 ${EZINST} git+${LNOVAVERSIONGIT} >> ${NOVALOG}
 ${EZINST} git+${SUPERNOVAGIT} >> ${NOVALOG}
