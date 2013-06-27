@@ -13,7 +13,7 @@
 #set -e
 
 # Temp Directory, This is Done like this because of OSX
-TMPDIR=$(mktemp -d XXXXX_Kenova_Temp)
+TMPDIR=$(mktemp -d XXXXXXXXXXX)
 
 # Installer Variables for NOVA
 NOVAVERSIONGIT="git://github.com/openstack/python-novaclient.git"
@@ -24,7 +24,7 @@ KEYRINGNAME="keyring"
 
 # File Log
 NOVALOG="$TMPDIR/Nova.Installation.log"
-
+echo $NOVALOG
 # Test for setuptools
 if ! python -c 'import setuptools' &>/dev/null; then
     echo "Setup Tools was not found on your system" 1>&2
