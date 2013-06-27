@@ -44,11 +44,14 @@ function kenova(){
     }
   
     function envset(){
-        ENVS1='NOVA_VERSION=2 NOVA_SERVICE_NAME=cloudServersOpenStack OS_AUTH_SYSTEM="rackspace" OS_USERNAME=$OS_USER_USERNAME'
-        ENVS2='NOVA_USERNAME=$OS_USERNAME OS_PASSWORD=$OS_USER_PASSWORD NOVA_PASSWORD=$OS_PASSWORD OS_TENANT_NAME=$OS_USER_USERNAME NOVA_PROJECT_ID=$OS_TENANT_NAME'
+        ENVS1="OS_USERNAME=$OS_USER_USERNAME OS_PASSWORD=$OS_USER_PASSWORD OS_TENANT_NAME=$OS_USER_USERNAME"
+        ENVS2="NOVA_USERNAME=$OS_USER_USERNAME NOVA_PASSWORD=$OS_USER_PASSWORD NOVA_PROJECT_ID=$OS_USER_USERNAME"
         for env in ${ENVS1} ${ENVS2}; do
             export $env
         done
+        export NOVA_VERSION=2
+        export NOVA_SERVICE_NAME=cloudServersOpenStack
+        export OS_AUTH_SYSTEM=rackspace
     }
   
     function setkeyring(){
@@ -122,7 +125,7 @@ function kenova(){
             if [[ "${OS_REGION_NAME}" == "--help" || "${OS_REGION_NAME}" == "-h" ]];then
                 helpinfo
             else
-                echo -e "You are presently impersonating: \"$OS_USER_USERNAME\" in \"$OS_REGION_NAME"\"
+                echo -e "You are presently impersonating: \"${OS_USER_USERNAME}\" in \"${OS_REGION_NAME}"\"
                 line
                 if [[ "${OS_REGION_NAME}" == "ord" || "${OS_REGION_NAME}" == "dfw" || "${OS_REGION_NAME}" == "syd"  ]];then
                     IDENTITY="https://identity.api.rackspacecloud.com/v2.0/"
