@@ -10,11 +10,11 @@
 # ==============================================================================
 
 function setrc(){
-    if [[ ! $(grep "kenova" $RCFILE) ]];then
+    if [[ ! $(grep "kenova" "$RCFILE") ]];then
         cat << EOF >> $RCFILE
 
-if [ -f $HOME/.kenova ];then
-    source ~/.kenova
+if [ -f "$HOME/.kenova" ];then
+    source "$HOME/.kenova"
 fi
 
 EOF
@@ -25,7 +25,7 @@ EOF
 
 # Installer for the kenova command and control script
 echo -e "\nInstalling the kenova script\n"
-cp -v kenova $HOME/.kenova
+cp -v kenova "$HOME"/.kenova
 
 if [ -f "$HOME/.bashrc" ];then
     RCFILE="$HOME/.bashrc"
