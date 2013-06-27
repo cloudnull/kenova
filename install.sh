@@ -69,7 +69,7 @@ if [[ -f "$NOVALOG" ]]; then
     mv "$NOVALOG" "$NOVALOG.old.$(date +%y%m%d%H%M).log"
 fi
 
-for module in keyring novaclient rackspace_auth_openstack supernova; do
+for module in prettytable keyring novaclient rackspace_auth_openstack supernova; do
     for locs in $(python -c "import site; print ' '.join(site.getsitepackages())"); do
         find "${locs}" -type d -name "*${module}*" -exec rm -rfv {} \; >> $NOVALOG
     done
@@ -90,3 +90,4 @@ setrc.sh
 "
 
 exit 0
+
