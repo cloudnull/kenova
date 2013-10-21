@@ -19,7 +19,7 @@ function kenova(){
                          [-l], [--list] for all available Environments
             new       -- Used to specify a Username and API Key for impersonation\n
         Rackspace Specific Functions :
-            [region]  -- Specific Region to use, [ord, dfw, syd, iad, lon, luk, lus]
+            [region]  -- Specific Region to use, [ord, dfw, syd, iad, lon, hk, luk, lus]
         \n"
     }
 
@@ -127,7 +127,7 @@ function kenova(){
             else
                 echo -e "You are presently impersonating: \"${OS_USER_USERNAME}\" in \"${OS_REGION_NAME}"\"
                 line
-                if [[ "${OS_REGION_NAME}" == "ord" || "${OS_REGION_NAME}" == "dfw" || "${OS_REGION_NAME}" == "syd" || "${OS_REGION_NAME}" == "iad" ]];then
+                if [[ "${OS_REGION_NAME}" == "ord" || "${OS_REGION_NAME}" == "dfw" || "${OS_REGION_NAME}" == "syd" || "${OS_REGION_NAME}" == "iad" || "${OS_REGION_NAME}" == "hk" ]];then
                     IDENTITY="https://identity.api.rackspacecloud.com/v2.0/"
                     shift 1
                     runnova $@

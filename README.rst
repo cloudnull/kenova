@@ -40,7 +40,7 @@ The ``kenova`` wrapper has been tested to work on most Linux and Unix systems th
     new       -- Used to specify a Username and API Key
 
   Rackspace Specific Functions :
-    [region]  -- Specific Region to use, [ord, dfw, syd, lon, luk, lus]
+    [region]  -- Specific Region to use, [ord, dfw, syd, iad, hk, lon, luk, lus]
 
 
 Once you have authenticated with the user name and the API-Key for the account that you want to interact with, simply enter the region that you are authenticated against and the function that you would like to perform.
